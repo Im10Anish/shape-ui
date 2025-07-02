@@ -101,9 +101,12 @@
     "vite": "^5.4.19"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
+    "*.{js,jsx,ts,tsx}": [
       "eslint --fix",
-      "git add"
+      "prettier --write"
+    ],
+    "*.{json,md,mdx}": [
+      "prettier --write"
     ]
   },
   "release": {
