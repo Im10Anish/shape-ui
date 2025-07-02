@@ -1,14 +1,51 @@
 {
   "name": "shape-ui",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "React component library for building user interfaces with a focus on accessibility and design consistency.",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "storybook dev -p 6006",
+    "build": "rollup -c",
+    "build-storybook": "storybook build",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "type-check": "tsc --noEmit",
+    "prepare": "husky install",
+    "prepublishOnly": "npm run build && npm run test",
+    "release": "semantic-release"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "react",
+    "components",
+    "ui",
+    "shadcn",
+    "tailwind",
+    "typescript",
+    "storybook"
+  ],
+  "author": "im10anish",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/im10anish/shape-ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/im10anish/shape-ui/issues"
+  },
+  "homepage": "https://github.com/im10anish/shape-ui#readme",
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
     "class-variance-authority": "^0.7.1",
@@ -62,5 +99,24 @@
     "ts-jest": "^29.4.0",
     "typescript": "^5.8.3",
     "vite": "^5.4.19"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/git",
+      "@semantic-release/github"
+    ]
   }
 }
