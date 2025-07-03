@@ -23,6 +23,22 @@ const config: StorybookConfig = {
         prop.parent ? !/node_modules/.test(prop.parent.fileName) : true,
     },
   },
+  viteFinal: async (config) => {
+    config.define = {
+      ...config.define,
+      global: "globalThis",
+    };
+
+    config.resolve = {
+      ...config.resolve,
+      alias: {
+        ...config.resolve?.alias,
+        crypto: "crypto",
+      },
+    };
+
+    return config;
+  },
 };
 
 export default config;
