@@ -8,6 +8,13 @@ jobs:
   release:
     runs-on: ubuntu-latest
 
+    # Add explicit permissions
+    permissions:
+      contents: write # For creating releases
+      issues: write # For creating issues
+      pull-requests: write # For creating PRs
+      packages: write # For publishing packages
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
