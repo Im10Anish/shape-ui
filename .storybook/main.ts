@@ -37,6 +37,17 @@ const config: StorybookConfig = {
       },
     };
 
+    if (process.env.CI) {
+      config.build = {
+        ...config.build,
+        chunkSizeWarningLimit: 1000,
+        rollupOptions: {
+          ...config.build?.rollupOptions,
+          external: ["crypto"],
+        },
+      };
+    }
+
     return config;
   },
 };

@@ -9,15 +9,14 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        node-version: [16.x, 18.x, 20.x]
+        node-version: [18.x, 20.x]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Needed for SonarCloud
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -35,25 +34,50 @@ jobs:
         run: npm run type-check
 
       - name: Run tests
-        run: npm run test:cov
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
-        if: matrix.node-version == '18.x' # Run only once
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: npm run test:coverage
 
       - name: Build library
         run: npm run build
 
-      - name: Build Storybook
-        run: npm run build-storybook
+      - name: Build Storybook (with Node.js options)
+        run: |
+          export NODE_OPTIONS="--openssl-legacy-provider --max-old-space-size=8192"
+          npm run build-storybook
+        env:
+          NODE_ENV: production
+
+  code-quality:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18.x"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests for coverage
+        run: npm run test:coverage
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   release:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
 
     steps:
       - name: Checkout code
@@ -73,6 +97,13 @@ jobs:
 
       - name: Build library
         run: npm run build
+
+      - name: Build Storybook for release
+        run: |
+          export NODE_OPTIONS="--openssl-legacy-provider --max-old-space-size=8192"
+          npm run build-storybook
+        env:
+          NODE_ENV: production
 
       - name: Release
         env:
