@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [20.x, 22.x] # Updated to Node.js 20+
 
     steps:
       - name: Checkout code
@@ -25,10 +25,7 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: |
-          rm -rf node_modules package-lock.json
-          npm cache clean --force
-          npm install
+        run: npm ci
 
       - name: Run linter
         run: npm run lint
@@ -42,10 +39,8 @@ jobs:
       - name: Build library
         run: npm run build
 
-      - name: Build Storybook (with Node.js options)
-        run: |
-          export NODE_OPTIONS="--openssl-legacy-provider --max-old-space-size=8192"
-          npm run build-storybook
+      - name: Build Storybook
+        run: npm run build-storybook
         env:
           NODE_ENV: production
 
@@ -59,10 +54,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Use Node.js
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: "18.x"
+          node-version: "20.x" # Updated to Node.js 20
           cache: "npm"
 
       - name: Install dependencies
@@ -89,10 +84,10 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Use Node.js
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: "18.x"
+          node-version: "20.x" # Updated to Node.js 20
           cache: "npm"
 
       - name: Install dependencies
@@ -101,10 +96,8 @@ jobs:
       - name: Build library
         run: npm run build
 
-      - name: Build Storybook for release
-        run: |
-          export NODE_OPTIONS="--openssl-legacy-provider --max-old-space-size=8192"
-          npm run build-storybook
+      - name: Build Storybook
+        run: npm run build-storybook
         env:
           NODE_ENV: production
 
