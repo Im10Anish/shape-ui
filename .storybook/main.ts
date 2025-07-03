@@ -45,7 +45,7 @@ const config: StorybookConfig = {
     if (configType === "PRODUCTION" && process.env.CI) {
       config.build = {
         ...config.build,
-        target: "es2015",
+        target: "es2020",
         rollupOptions: {
           ...config.build?.rollupOptions,
           external: ["crypto"],
