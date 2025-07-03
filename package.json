@@ -33,16 +33,16 @@
     "typescript",
     "storybook"
   ],
-  "author": "im10anish",
+  "author": "Im10Anish",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/im10anish/shape-ui.git"
+    "url": "https://github.com/Im10Anish/shape-ui.git"
   },
   "bugs": {
-    "url": "https://github.com/im10anish/shape-ui/issues"
+    "url": "https://github.com/Im10Anish/shape-ui/issues"
   },
-  "homepage": "https://github.com/im10anish/shape-ui#readme",
+  "homepage": "https://github.com/Im10Anish/shape-ui#readme",
   "peerDependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
