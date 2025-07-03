@@ -9,11 +9,11 @@ const config: StorybookConfig = {
   ],
   framework: {
     name: "@storybook/react-vite",
-    options: {},
+    options: {
+      strictMode: false,
+    },
   },
-  docs: {
-    autodocs: "tag",
-  },
+  docs: {},
   typescript: {
     check: false,
     reactDocgen: "react-docgen-typescript",
@@ -23,10 +23,14 @@ const config: StorybookConfig = {
         prop.parent ? !/node_modules/.test(prop.parent.fileName) : true,
     },
   },
-  viteFinal: async (config) => {
+  viteFinal: async (config, { configType }) => {
+    // Enhanced CI-specific configuration
     config.define = {
       ...config.define,
       global: "globalThis",
+      "process.env.NODE_ENV": JSON.stringify(
+        process.env.NODE_ENV || "production",
+      ),
     };
 
     config.resolve = {
@@ -37,13 +41,21 @@ const config: StorybookConfig = {
       },
     };
 
-    if (process.env.CI) {
+    // CI-specific build optimizations
+    if (configType === "PRODUCTION" && process.env.CI) {
       config.build = {
         ...config.build,
-        chunkSizeWarningLimit: 1000,
+        target: "es2015",
         rollupOptions: {
           ...config.build?.rollupOptions,
           external: ["crypto"],
+          output: {
+            ...config.build?.rollupOptions?.output,
+            inlineDynamicImports: false,
+            manualChunks: {
+              vendor: ["react", "react-dom"],
+            },
+          },
         },
       };
     }
