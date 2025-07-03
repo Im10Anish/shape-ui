@@ -7,7 +7,7 @@ on:
     branches: [master, develop]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
 
     strategy:
@@ -73,7 +73,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   release:
-    needs: test
+    needs: build-and-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
 
