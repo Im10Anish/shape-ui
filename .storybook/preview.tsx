@@ -1,6 +1,7 @@
 import type { Preview } from "@storybook/react-vite";
 import React from "react";
 import "../src/styles/globals.css";
+import { ThemeProvider } from "../src/theme/ThemeProvider";
 
 const preview: Preview = {
   parameters: {
@@ -21,8 +22,11 @@ const preview: Preview = {
       defaultValue: "light",
       toolbar: {
         title: "Theme",
-        icon: "circlehollow",
-        items: ["light", "dark"],
+        icon: "paintbrush",
+        items: [
+          { value: "light", title: "Light", icon: "sun" },
+          { value: "dark", title: "Dark", icon: "moon" },
+        ],
         dynamicTitle: true,
       },
     },
@@ -31,11 +35,11 @@ const preview: Preview = {
     (Story, context) => {
       const theme = context.globals.theme || "light";
       return (
-        <div className={theme === "dark" ? "dark" : ""}>
-          <div className="min-h-screen bg-background text-foreground p-4">
+        <ThemeProvider defaultColorMode={theme}>
+          <div className="p-4">
             <Story />
           </div>
-        </div>
+        </ThemeProvider>
       );
     },
   ],
