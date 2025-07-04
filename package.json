@@ -34,7 +34,10 @@
     "shadcn",
     "tailwind",
     "typescript",
-    "storybook"
+    "storybook",
+    "theming",
+    "theme",
+    "design-system"
   ],
   "author": "Im10Anish",
   "license": "MIT",
@@ -121,5 +124,17 @@
       "@semantic-release/npm",
       "@semantic-release/github"
     ]
-  }
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles": "./dist/styles/globals.css",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
 }
