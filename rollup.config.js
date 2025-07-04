@@ -14,17 +14,26 @@ module.exports = [
         file: packageJson.main,
         format: "cjs",
         sourcemap: true,
+        exports: "named",
       },
       {
         file: packageJson.module,
         format: "esm",
         sourcemap: true,
+        exports: "named",
       },
     ],
     plugins: [
-      resolve(),
+      resolve({
+        browser: true,
+        preferBuiltins: false,
+      }),
       commonjs(),
-      typescript({ tsconfig: "./tsconfig.json" }),
+      typescript({
+        tsconfig: "./tsconfig.json",
+        declaration: true,
+        declarationDir: "dist",
+      }),
       postcss({
         config: {
           path: "./postcss.config.js",
@@ -36,12 +45,26 @@ module.exports = [
         },
       }),
     ],
-    external: ["react", "react-dom"],
+    // Keep React external but bundle utility libraries
+    external: [
+      "react",
+      "react-dom",
+      "@radix-ui/react-slot",
+      "react/jsx-runtime",
+      "react/jsx-dev-runtime",
+    ],
   },
   {
     input: "dist/index.d.ts",
     output: [{ file: "dist/index.d.ts", format: "esm" }],
     plugins: [dts()],
-    external: [/\.css$/],
+    external: [
+      /\.css$/,
+      "react",
+      "react-dom",
+      "@radix-ui/react-slot",
+      "react/jsx-runtime",
+      "react/jsx-dev-runtime",
+    ],
   },
 ];
