@@ -33,6 +33,12 @@ module.exports = [
         tsconfig: "./tsconfig.json",
         declaration: true,
         declarationDir: "dist",
+        exclude: [
+          "**/*.test.ts",
+          "**/*.test.tsx",
+          "**/*.stories.ts",
+          "**/*.stories.tsx",
+        ],
       }),
       postcss({
         config: {
@@ -40,12 +46,10 @@ module.exports = [
         },
         extensions: [".css"],
         minimize: true,
-        inject: {
-          insertAt: "top",
-        },
+        extract: "styles/globals.css", // Extract CSS to separate file
+        sourceMap: true,
       }),
     ],
-    // Keep React external but bundle utility libraries
     external: [
       "react",
       "react-dom",

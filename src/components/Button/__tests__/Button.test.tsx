@@ -1,13 +1,13 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Button } from "./Button";
+import { Button } from "../Button";
 
 describe("Button", () => {
   it("renders button with text", () => {
     render(<Button>Click me</Button>);
     expect(
-      screen.getByRole("button", { name: /click me/i })
+      screen.getByRole("button", { name: /click me/i }),
     ).toBeInTheDocument();
   });
 
@@ -40,7 +40,7 @@ describe("Button", () => {
     const button = screen.getByRole("button");
     expect(button).toHaveClass(
       "hover:bg-accent",
-      "hover:text-accent-foreground"
+      "hover:text-accent-foreground",
     );
   });
 
@@ -100,7 +100,7 @@ describe("Button", () => {
     expect(button).toBeDisabled();
     expect(button).toHaveClass(
       "disabled:pointer-events-none",
-      "disabled:opacity-50"
+      "disabled:opacity-50",
     );
   });
 
@@ -109,7 +109,7 @@ describe("Button", () => {
     render(
       <Button disabled onClick={handleClick}>
         Disabled Button
-      </Button>
+      </Button>,
     );
 
     const button = screen.getByRole("button");
@@ -130,7 +130,7 @@ describe("Button", () => {
     render(
       <Button data-testid="test-button" aria-label="Test">
         Props Button
-      </Button>
+      </Button>,
     );
     const button = screen.getByRole("button");
 
@@ -142,7 +142,7 @@ describe("Button", () => {
     render(
       <Button asChild>
         <a href="/test">Link Button</a>
-      </Button>
+      </Button>,
     );
 
     const link = screen.getByRole("link");
@@ -155,7 +155,7 @@ describe("Button", () => {
     render(
       <Button variant="outline" size="lg">
         Combined Button
-      </Button>
+      </Button>,
     );
     const button = screen.getByRole("button");
 
@@ -171,7 +171,7 @@ describe("Button", () => {
       "focus-visible:outline-none",
       "focus-visible:ring-2",
       "focus-visible:ring-ring",
-      "focus-visible:ring-offset-2"
+      "focus-visible:ring-offset-2",
     );
   });
 
@@ -186,7 +186,7 @@ describe("Button", () => {
     render(
       <Button type="submit" form="test-form">
         Submit Button
-      </Button>
+      </Button>,
     );
     const button = screen.getByRole("button");
 
