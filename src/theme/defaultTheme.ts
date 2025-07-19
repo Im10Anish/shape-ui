@@ -28,91 +28,93 @@ const destructiveColorScale = {
 } as const;
 
 // Function to create theme colors with minimal duplication
-const createThemeColors = (
-  background: string,
-  foreground: string,
-  primaryDefault: string,
-  primaryForeground: string,
-  secondaryDefault: string,
-  mutedDefault: string,
-  mutedForeground: string,
-  accentDefault: string,
-  destructiveDefault: string,
-  destructiveForeground: string,
-  border: string,
-  input: string,
-  ring: string,
-): ThemeColors => ({
-  background,
-  foreground,
+interface ThemeColorParams {
+  background: string;
+  foreground: string;
+  primaryDefault: string;
+  primaryForeground: string;
+  secondaryDefault: string;
+  mutedDefault: string;
+  mutedForeground: string;
+  accentDefault: string;
+  destructiveDefault: string;
+  destructiveForeground: string;
+  border: string;
+  input: string;
+  ring: string;
+}
+
+const createThemeColors = (params: ThemeColorParams): ThemeColors => ({
+  background: params.background,
+  foreground: params.foreground,
   card: {
-    DEFAULT: background,
-    foreground,
+    DEFAULT: params.background,
+    foreground: params.foreground,
   },
   popover: {
-    DEFAULT: background,
-    foreground,
+    DEFAULT: params.background,
+    foreground: params.foreground,
   },
   primary: {
-    DEFAULT: primaryDefault,
-    foreground: primaryForeground,
+    DEFAULT: params.primaryDefault,
+    foreground: params.primaryForeground,
     ...primaryColorScale,
-    500: primaryDefault,
+    500: params.primaryDefault,
   },
   secondary: {
-    DEFAULT: secondaryDefault,
-    foreground,
+    DEFAULT: params.secondaryDefault,
+    foreground: params.foreground,
   },
   muted: {
-    DEFAULT: mutedDefault,
-    foreground: mutedForeground,
+    DEFAULT: params.mutedDefault,
+    foreground: params.mutedForeground,
   },
   accent: {
-    DEFAULT: accentDefault,
-    foreground,
+    DEFAULT: params.accentDefault,
+    foreground: params.foreground,
   },
   destructive: {
-    DEFAULT: destructiveDefault,
-    foreground: destructiveForeground,
+    DEFAULT: params.destructiveDefault,
+    foreground: params.destructiveForeground,
     ...destructiveColorScale,
-    500: destructiveDefault,
+    500: params.destructiveDefault,
   },
-  border,
-  input,
-  ring,
+  border: params.border,
+  input: params.input,
+  ring: params.ring,
 });
 
-export const defaultLightColors: ThemeColors = createThemeColors(
-  "0 0% 100%",
-  "222.2 84% 4.9%",
-  "221.2 83.2% 53.3%",
-  "210 40% 98%",
-  "210 40% 96%",
-  "210 40% 96%",
-  "215.4 16.3% 46.9%",
-  "210 40% 96%",
-  "0 84.2% 60.2%",
-  "210 40% 98%",
-  "214.3 31.8% 91.4%",
-  "214.3 31.8% 91.4%",
-  "221.2 83.2% 53.3%",
-);
+export const defaultLightColors: ThemeColors = createThemeColors({
+  background: "0 0% 100%",
+  foreground: "222.2 84% 4.9%",
+  primaryDefault: "221.2 83.2% 53.3%",
+  primaryForeground: "210 40% 98%",
+  secondaryDefault: "210 40% 96%",
+  mutedDefault: "210 40% 96%",
+  mutedForeground: "215.4 16.3% 46.9%",
+  accentDefault: "210 40% 96%",
+  destructiveDefault: "0 84.2% 60.2%",
+  destructiveForeground: "210 40% 98%",
+  border: "214.3 31.8% 91.4%",
+  input: "214.3 31.8% 91.4%",
+  ring: "221.2 83.2% 53.3%",
+});
 
-export const defaultDarkColors: ThemeColors = createThemeColors(
-  "222.2 84% 4.9%",
-  "210 40% 98%",
-  "217.2 91.2% 59.8%",
-  "222.2 84% 4.9%",
-  "217.2 32.6% 17.5%",
-  "217.2 32.6% 17.5%",
-  "215 20.2% 65.1%",
-  "217.2 32.6% 17.5%",
-  "0 62.8% 30.6%",
-  "210 40% 98%",
-  "217.2 32.6% 17.5%",
-  "217.2 32.6% 17.5%",
-  "224.3 76.3% 94.1%",
-);
+export const defaultDarkColors: ThemeColors = createThemeColors({
+  background: "222.2 84% 4.9%",
+  foreground: "210 40% 98%",
+  primaryDefault: "217.2 91.2% 59.8%",
+  primaryForeground: "222.2 84% 4.9%",
+  secondaryDefault: "217.2 32.6% 17.5%",
+  mutedDefault: "217.2 32.6% 17.5%",
+  mutedForeground: "215 20.2% 65.1%",
+  accentDefault: "217.2 32.6% 17.5%",
+  destructiveDefault: "0 62.8% 30.6%",
+  destructiveForeground: "210 40% 98%",
+  border: "217.2 32.6% 17.5%",
+  input: "217.2 32.6% 17.5%",
+  ring: "224.3 76.3% 94.1%",
+});
 
 // Shared theme configuration
 const borderRadius = {

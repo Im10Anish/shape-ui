@@ -15,11 +15,11 @@ const ThemeContext = React.createContext<ThemeContextValue | undefined>(
 );
 
 export interface ThemeProviderProps {
-  children: React.ReactNode;
-  theme?: Partial<ThemeConfig>;
-  defaultColorMode?: "light" | "dark" | "system";
-  enableColorModeToggle?: boolean;
-  storageKey?: string;
+  readonly children: React.ReactNode;
+  readonly theme?: Partial<ThemeConfig>;
+  readonly defaultColorMode?: "light" | "dark" | "system";
+  readonly enableColorModeToggle?: boolean;
+  readonly storageKey?: string;
 }
 
 // Utility functions
@@ -124,7 +124,7 @@ const applyThemeToDOM = (
     if (theme.cssVars) {
       Object.entries(theme.cssVars).forEach(([key, value]) => {
         try {
-          root.style.setProperty(key, value as string);
+          root.style.setProperty(key, value);
         } catch {
           // Ignore CSS errors
         }

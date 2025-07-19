@@ -4,9 +4,9 @@ import { Button } from "../Button/Button";
 import { useTheme } from "../../theme/ThemeProvider";
 
 export interface ThemeToggleProps {
-  className?: string;
-  size?: "sm" | "default" | "lg" | "icon";
-  variant?:
+  readonly className?: string;
+  readonly size?: "sm" | "default" | "lg" | "icon";
+  readonly variant?:
     | "default"
     | "destructive"
     | "outline"
