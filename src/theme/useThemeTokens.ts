@@ -4,12 +4,12 @@ export function useThemeTokens() {
   const { theme } = useTheme();
 
   return {
-    colors: theme.colors || {},
-    spacing: theme.spacing || {},
-    borderRadius: theme.borderRadius || {},
-    typography: theme.typography || {},
-    breakpoints: theme.breakpoints || {},
-    shadows: theme.shadows || {},
+    colors: theme.colors,
+    spacing: theme.spacing,
+    borderRadius: theme.borderRadius,
+    typography: theme.typography,
+    breakpoints: theme.breakpoints,
+    shadows: theme.shadows,
     // Utility functions
     getColor: (path: string) => {
       const keys = path.split(".");
