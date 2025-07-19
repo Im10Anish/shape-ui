@@ -143,7 +143,13 @@ const applyThemeToDOM = (
   }
 };
 
-export { initializeColorMode };
+export {
+  initializeColorMode,
+  getStoredColorMode,
+  setStoredColorMode,
+  applyThemeToDOM,
+  getSystemColorMode,
+};
 
 export function ThemeProvider({
   children,
@@ -178,16 +184,22 @@ export function ThemeProvider({
     if (typeof window === "undefined") return;
     if (!window.matchMedia) return;
 
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = (e: MediaQueryListEvent) => {
-      setColorModeState(e.matches ? "dark" : "light");
-    };
+    try {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      if (!mediaQuery) return;
 
-    mediaQuery.addEventListener("change", handleChange);
+      const handleChange = (e: MediaQueryListEvent) => {
+        setColorModeState(e.matches ? "dark" : "light");
+      };
 
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange);
-    };
+      mediaQuery.addEventListener("change", handleChange);
+
+      return () => {
+        mediaQuery.removeEventListener("change", handleChange);
+      };
+    } catch {
+      // Ignore matchMedia errors
+    }
   }, [defaultColorMode]);
 
   const setColorMode = React.useCallback(

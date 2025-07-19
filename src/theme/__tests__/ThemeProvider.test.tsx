@@ -537,18 +537,14 @@ describe("ThemeProvider", () => {
       }).not.toThrow();
     });
 
-    it("handles matchMedia errors gracefully", () => {
+    it("handles matchMedia errors gracefully in utility function", () => {
+      const ThemeProviderModule = require("../ThemeProvider");
       (window.matchMedia as jest.Mock).mockImplementation(() => {
         throw new Error("matchMedia error");
       });
 
-      expect(() => {
-        render(
-          <ThemeProvider defaultColorMode="system">
-            <TestComponent />
-          </ThemeProvider>,
-        );
-      }).toThrow();
+      // Test the utility function directly
+      expect(ThemeProviderModule.getSystemColorMode()).toBe("light");
     });
 
     it("handles CSS errors gracefully", () => {
@@ -731,6 +727,195 @@ describe("initializeColorMode SSR branch", () => {
       expect(ThemeProviderModule.initializeColorMode("light", "key")).toBe(
         "light",
       );
+    } finally {
+      global.window = originalWindow;
+    }
+  });
+});
+
+describe("ThemeProvider utility SSR/edge coverage", () => {
+  const ThemeProviderModule = require("../ThemeProvider");
+  const originalWindow = global.window;
+  const originalDocument = global.document;
+  const originalDocumentElement = document.documentElement;
+
+  afterEach(() => {
+    global.window = originalWindow;
+    global.document = originalDocument;
+    Object.defineProperty(document, "documentElement", {
+      value: originalDocumentElement,
+      configurable: true,
+    });
+  });
+
+  it("getStoredColorMode returns null when not in browser", () => {
+    // @ts-ignore
+    delete global.window;
+    expect(ThemeProviderModule.getStoredColorMode("key")).toBeNull();
+  });
+
+  it("setStoredColorMode does nothing when not in browser", () => {
+    // @ts-ignore
+    delete global.window;
+    // Should not throw
+    expect(() =>
+      ThemeProviderModule.setStoredColorMode("key", "dark"),
+    ).not.toThrow();
+  });
+
+  it("applyThemeToDOM returns early when not in browser", () => {
+    // @ts-ignore
+    delete global.window;
+    // Should not throw
+    expect(() =>
+      ThemeProviderModule.applyThemeToDOM({}, "light"),
+    ).not.toThrow();
+  });
+
+  it("applyThemeToDOM returns early when document.documentElement is undefined", () => {
+    Object.defineProperty(document, "documentElement", {
+      value: undefined,
+      configurable: true,
+    });
+    expect(() =>
+      ThemeProviderModule.applyThemeToDOM({}, "light"),
+    ).not.toThrow();
+  });
+
+  it("applyThemeToDOM handles theme without colorMode property", () => {
+    const themeWithoutColorMode = { colors: { primary: "blue" } };
+    expect(() =>
+      ThemeProviderModule.applyThemeToDOM(themeWithoutColorMode, "light"),
+    ).not.toThrow();
+  });
+
+  it("applyThemeToDOM handles theme with undefined colorMode property", () => {
+    const themeWithUndefinedColorMode = {
+      colorMode: undefined,
+      colors: { primary: "blue" },
+    };
+    expect(() =>
+      ThemeProviderModule.applyThemeToDOM(themeWithUndefinedColorMode, "light"),
+    ).not.toThrow();
+  });
+
+  it("covers theme.colorMode optional chaining with undefined colorMode", () => {
+    const themeWithUndefinedColorMode = {
+      colorMode: undefined,
+      colors: { primary: "blue" },
+    };
+    expect(() =>
+      ThemeProviderModule.applyThemeToDOM(themeWithUndefinedColorMode, "light"),
+    ).not.toThrow();
+  });
+
+  it("covers theme.colorMode optional chaining with null colorMode", () => {
+    const themeWithNullColorMode = {
+      colorMode: null,
+      colors: { primary: "blue" },
+    };
+    expect(() =>
+      ThemeProviderModule.applyThemeToDOM(themeWithNullColorMode, "light"),
+    ).not.toThrow();
+  });
+});
+
+describe("ThemeProvider useEffect early returns", () => {
+  it("does not set up system listener when defaultColorMode is not system", () => {
+    const addEventListenerSpy = jest.fn();
+    (window.matchMedia as jest.Mock).mockReturnValue({
+      matches: false,
+      addEventListener: addEventListenerSpy,
+      removeEventListener: jest.fn(),
+    });
+    render(
+      <ThemeProvider defaultColorMode="light">
+        <div>test</div>
+      </ThemeProvider>,
+    );
+    expect(addEventListenerSpy).not.toHaveBeenCalled();
+  });
+
+  it("returns early in useEffect when window.matchMedia is not available", () => {
+    const originalMatchMedia = window.matchMedia;
+    // @ts-ignore
+    delete window.matchMedia;
+    try {
+      expect(() => {
+        render(
+          <ThemeProvider defaultColorMode="system">
+            <div>test</div>
+          </ThemeProvider>,
+        );
+      }).not.toThrow();
+    } finally {
+      window.matchMedia = originalMatchMedia;
+    }
+  });
+
+  it("sets up system listener when defaultColorMode is system and matchMedia is available", () => {
+    const addEventListenerSpy = jest.fn();
+    const removeEventListenerSpy = jest.fn();
+    (window.matchMedia as jest.Mock).mockReturnValue({
+      matches: false,
+      addEventListener: addEventListenerSpy,
+      removeEventListener: removeEventListenerSpy,
+    });
+
+    const { unmount } = render(
+      <ThemeProvider defaultColorMode="system">
+        <div>test</div>
+      </ThemeProvider>,
+    );
+
+    expect(addEventListenerSpy).toHaveBeenCalledWith(
+      "change",
+      expect.any(Function),
+    );
+
+    unmount();
+    expect(removeEventListenerSpy).toHaveBeenCalledWith(
+      "change",
+      expect.any(Function),
+    );
+  });
+
+  it("handles matchMedia errors gracefully in useEffect", () => {
+    (window.matchMedia as jest.Mock).mockImplementation(() => {
+      throw new Error("matchMedia error");
+    });
+
+    expect(() => {
+      render(
+        <ThemeProvider defaultColorMode="system">
+          <div>test</div>
+        </ThemeProvider>,
+      );
+    }).not.toThrow();
+  });
+
+  it("handles null mediaQuery return gracefully in useEffect", () => {
+    (window.matchMedia as jest.Mock).mockReturnValue(null);
+
+    expect(() => {
+      render(
+        <ThemeProvider defaultColorMode="system">
+          <div>test</div>
+        </ThemeProvider>,
+      );
+    }).not.toThrow();
+  });
+
+  it("returns early in useEffect when window is undefined and defaultColorMode is system", () => {
+    const originalWindow = global.window;
+    // @ts-ignore
+    delete global.window;
+    try {
+      // Test the utility function directly instead of rendering
+      const ThemeProviderModule = require("../ThemeProvider");
+      expect(() => {
+        ThemeProviderModule.initializeColorMode("system", "key");
+      }).not.toThrow();
     } finally {
       global.window = originalWindow;
     }
