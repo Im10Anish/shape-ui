@@ -1,0 +1,287 @@
+# Shape UI - Cursor Rules
+
+## Project Overview
+
+This is a production-grade React component library built with shadcn/ui, Tailwind CSS, and TypeScript. The project requires 100% test coverage and follows strict quality standards.
+
+## Code Style & Standards
+
+### TypeScript
+
+- Use strict TypeScript configuration as defined in `tsconfig.json`
+- Always use proper type annotations
+- Prefer interfaces over types for object shapes
+- Use path aliases: `@/*` maps to `src/*`
+- Enable declaration and declarationMap for better DX
+
+### React Components
+
+- Use functional components with hooks
+- Follow React 18 patterns and best practices
+- Use `react-jsx` transform (no need to import React)
+- Implement proper prop interfaces with TypeScript
+- Use `@radix-ui/react-slot` for component composition
+- Follow accessibility best practices (WAI-ARIA compliant)
+
+### Styling
+
+- Use Tailwind CSS for styling
+- Follow the design system defined in `tailwind.config.js`
+- Use CSS custom properties for theming (CSS variables)
+- Support both light and dark modes
+- Use `clsx` and `tailwind-merge` for conditional classes
+- Use `class-variance-authority` for component variants
+
+### File Structure
+
+- Components go in `src/components/[ComponentName]/`
+- Each component should have:
+  - `ComponentName.tsx` - Main component
+  - `ComponentName.stories.tsx` - Storybook stories
+  - `__tests__/ComponentName.test.tsx` - Tests
+- Theme utilities in `src/theme/`
+- Types in `src/types/`
+- Utilities in `src/lib/`
+
+## Testing Requirements
+
+### Coverage Standards
+
+- **100% test coverage required** - CI/CD pipeline fails if coverage < 100%
+- Coverage thresholds:
+  - Branches: 93%
+  - Functions: 100%
+  - Lines: 100%
+  - Statements: 99%
+
+### Testing Patterns
+
+- Use Jest with `ts-jest` preset
+- Use React Testing Library for component tests
+- Use `@testing-library/user-event` for user interactions
+- Test files should be in `__tests__/` directories
+- Use `jsdom` test environment
+- Exclude stories and test setup from coverage
+
+### Test Structure
+
+```typescript
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { ComponentName } from "./ComponentName";
+
+describe("ComponentName", () => {
+  it("should render correctly", () => {
+    render(<ComponentName />);
+    // assertions
+  });
+
+  it("should handle user interactions", async () => {
+    const user = userEvent.setup();
+    render(<ComponentName />);
+    // user interactions and assertions
+  });
+});
+```
+
+## Build & Development
+
+### Scripts
+
+- `npm run dev` - Start Storybook development server
+- `npm run build` - Build library with Rollup
+- `npm run test` - Run tests
+- `npm run test:coverage` - Run tests with coverage
+- `npm run lint` - Run ESLint
+- `npm run type-check` - TypeScript type checking
+
+### Build Configuration
+
+- Use Rollup for bundling
+- Generate both CJS and ESM outputs
+- Extract CSS to separate file
+- Generate TypeScript declarations
+- External dependencies: React, React-DOM, Radix UI
+
+## Quality Assurance
+
+### Linting & Formatting
+
+- ESLint with TypeScript and React rules
+- Prettier for code formatting
+- Husky for git hooks
+- Lint-staged for pre-commit checks
+
+### Commit Standards
+
+- Use conventional commits format
+- Commit types: build, chore, ci, docs, feat, fix, perf, refactor, revert, style, test
+- Subject case: lowercase
+- Max header length: 100 characters
+- No trailing periods in subject
+
+### Dependencies
+
+- Peer dependencies: React >=16.8.0 <20.0.0, React-DOM, @radix-ui/react-slot
+- Core dependencies: clsx, tailwind-merge, class-variance-authority, lucide-react
+- Development tools: TypeScript, Jest, Storybook, Rollup, ESLint
+
+## Component Development Guidelines
+
+### Component Structure
+
+```typescript
+import React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+
+const componentVariants = cva("base-classes", {
+  variants: {
+    variant: {
+      default: "default-classes",
+      // other variants
+    },
+    size: {
+      default: "default-size",
+      // other sizes
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+    size: "default",
+  },
+});
+
+export interface ComponentNameProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof componentVariants> {
+  // custom props
+}
+
+export const ComponentName = React.forwardRef<
+  HTMLDivElement,
+  ComponentNameProps
+>(({ className, variant, size, ...props }, ref) => {
+  return (
+    <div
+      className={cn(componentVariants({ variant, size, className }))}
+      ref={ref}
+      {...props}
+    />
+  );
+});
+
+ComponentName.displayName = "ComponentName";
+```
+
+### Storybook Stories
+
+- Create comprehensive stories for each component
+- Include all variants and states
+- Add proper documentation
+- Use Storybook addons for testing
+
+### Accessibility
+
+- Implement proper ARIA attributes
+- Ensure keyboard navigation
+- Support screen readers
+- Follow WCAG guidelines
+- Test with accessibility tools
+
+## Theming System
+
+### CSS Custom Properties
+
+- Use CSS variables for theme values
+- Support dynamic theme switching
+- Maintain consistent color palette
+- Support custom brand colors
+
+### Theme Provider
+
+- Use ThemeProvider for context
+- Support light/dark mode
+- Allow custom theme overrides
+- Provide theme tokens
+
+## Performance Considerations
+
+### Bundle Optimization
+
+- Tree-shakeable exports
+- Minimal bundle size
+- Optimized CSS extraction
+- Proper external dependencies
+
+### Component Optimization
+
+- Use React.memo when appropriate
+- Optimize re-renders
+- Lazy load when possible
+- Efficient prop handling
+
+## Documentation
+
+### Code Comments
+
+- JSDoc for public APIs
+- Inline comments for complex logic
+- Component usage examples
+- Type documentation
+
+### README Updates
+
+- Keep installation instructions current
+- Document breaking changes
+- Provide usage examples
+- Maintain feature list
+
+## Security
+
+### Dependencies
+
+- Regular security audits
+- Keep dependencies updated
+- Use npm audit
+- Monitor for vulnerabilities
+
+### Code Security
+
+- Sanitize user inputs
+- Avoid XSS vulnerabilities
+- Secure prop handling
+- Follow React security best practices
+
+## Deployment & Publishing
+
+### Release Process
+
+- Use semantic-release for versioning
+- Automated changelog generation
+- NPM publishing
+- GitHub releases
+
+### Pre-publish Checks
+
+- Build verification
+- Test suite passing
+- Coverage requirements met
+- Type checking passed
+- Linting clean
+
+## Troubleshooting
+
+### Common Issues
+
+- Test coverage not meeting thresholds
+- TypeScript compilation errors
+- Storybook build failures
+- Rollup bundling issues
+
+### Debug Commands
+
+- `npm run type-check` - Check TypeScript errors
+- `npm run test:coverage` - Verify coverage
+- `npm run lint` - Check linting issues
+- `npm run build` - Test build process
