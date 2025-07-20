@@ -2,20 +2,23 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*" # Only trigger on version tags
-  workflow_dispatch: # Allow manual triggers
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    outputs:
+      new_release_published: ${{ steps.semantic.outputs.new_release_published }}
+      new_release_version: ${{ steps.semantic.outputs.new_release_version }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -46,10 +49,17 @@ jobs:
         run: npm run build
 
       - name: Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm run release
+        with:
+          semantic_version: 22
+          branches: |
+            [
+              'master'
+            ]
 
   # This job will be triggered after a successful release
   deploy-storybook:

@@ -81,9 +81,9 @@ SONAR_TOKEN=your_sonarcloud_token
 1. **Development**: Push to `develop` branch triggers CI tests
 2. **Pull Requests**: Triggers CI tests and quality checks (no deployment)
 3. **Release**: Push to `master` branch triggers:
-   - Semantic versioning
-   - NPM package publishing
-   - Storybook deployment to Netlify
+   - Semantic versioning (if new version is needed)
+   - NPM package publishing (if new version is created)
+   - Storybook deployment to Netlify (if new version is created)
    - SonarCloud quality gate validation
 4. **Manual**: Use GitHub Actions "workflow_dispatch" to manually trigger deployments
 
@@ -91,15 +91,14 @@ SONAR_TOKEN=your_sonarcloud_token
 
 ✅ **Storybook deploys when:**
 
-- A version tag is pushed (e.g., `v1.2.3`)
-- Semantic-release creates a new version
+- Code is merged to master AND semantic-release creates a new version
 - Manual trigger via GitHub Actions
 
 ❌ **Storybook does NOT deploy when:**
 
 - Pull requests are opened/updated
 - Code is pushed to feature branches
-- Code is merged to master (without semantic-release)
+- Code is merged to master but no new version is needed
 
 ### Manual Deployment
 
