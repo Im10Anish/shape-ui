@@ -9,9 +9,6 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    outputs:
-      new_release_published: ${{ steps.semantic.outputs.new_release_published }}
-      new_release_version: ${{ steps.semantic.outputs.new_release_version }}
 
     steps:
       - name: Checkout code
@@ -48,45 +45,24 @@ jobs:
       - name: Build library
         run: npm run build
 
-      - name: Release
-        id: semantic
+      - name: Setup NPM
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_ENV: production
         run: |
-          # Set npm registry token
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
           echo "registry=https://registry.npmjs.org/" >> ~/.npmrc
           echo "always-auth=true" >> ~/.npmrc
 
-          # Get current version before release
-          OLD_VERSION=$(node -p "require('./package.json').version")
-          echo "Current version: $OLD_VERSION"
-
-          # Run semantic-release
-          npx semantic-release --dry-run=false
-
-          # Get new version after release
-          NEW_VERSION=$(node -p "require('./package.json').version")
-          echo "New version: $NEW_VERSION"
-
-          # Check if version changed
-          if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
-            echo "new_release_published=true" >> $GITHUB_OUTPUT
-            echo "new_release_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-            echo "✅ New version published: $NEW_VERSION"
-          else
-            echo "new_release_published=false" >> $GITHUB_OUTPUT
-            echo "new_release_version=" >> $GITHUB_OUTPUT
-            echo "ℹ️ No new version needed"
-          fi
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm run release
 
   # This job will be triggered after a successful release
   deploy-storybook:
     needs: release
     runs-on: ubuntu-latest
-    if: needs.release.outputs.new_release_published == 'true'
 
     steps:
       - name: Checkout code
@@ -112,7 +88,7 @@ jobs:
           publish-dir: "./storybook-static"
           production-branch: master
           github-token: ${{ secrets.RELEASE_TOKEN }}
-          deploy-message: "Deploy Storybook for ${{ needs.release.outputs.new_release_version }}"
+          deploy-message: "Deploy Storybook for new release"
           enable-pull-request-comment: false
           enable-commit-comment: true
           overwrites-pull-request-comment: true
