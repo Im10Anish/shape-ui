@@ -6,13 +6,15 @@ const meta: Meta<typeof ThemeToggle> = {
   title: "Components/ThemeToggle",
   component: ThemeToggle,
   parameters: {
+    layout: "centered",
     docs: {
       description: {
         component:
-          "A button component for toggling between light and dark themes.",
+          "A theme toggle component that allows users to switch between light and dark modes.",
       },
     },
   },
+  tags: ["autodocs"],
   decorators: [
     (Story) => (
       <ThemeProvider>

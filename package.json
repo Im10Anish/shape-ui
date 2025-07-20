@@ -25,7 +25,9 @@
     "type-check": "tsc --noEmit",
     "prepare": "husky install",
     "prepublishOnly": "npm run build && npm run test",
-    "release": "semantic-release"
+    "release": "semantic-release",
+    "deploy-storybook": "npm run build-storybook:ci && netlify deploy --prod --dir=storybook-static",
+    "deploy-storybook:preview": "npm run build-storybook:ci && netlify deploy --dir=storybook-static"
   },
   "keywords": [
     "react",
