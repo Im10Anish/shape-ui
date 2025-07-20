@@ -207,7 +207,7 @@ npm run deploy-storybook:preview
   publish = "storybook-static"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
   NODE_OPTIONS = "--openssl-legacy-provider --max-old-space-size=8192"
 
 [[redirects]]
@@ -261,7 +261,7 @@ viteFinal: async (config, { configType }) => {
 ### Common Issues
 
 1. **Build Failures**:
-   - Check Node.js version (use 18.x)
+   - Check Node.js version (use 20.x)
    - Ensure all dependencies are installed
    - Verify NODE_OPTIONS are set correctly
 
