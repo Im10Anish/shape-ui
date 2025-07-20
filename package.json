@@ -116,17 +116,6 @@
       "npx prettier --write"
     ]
   },
-  "release": {
-    "branches": [
-      "master"
-    ],
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      "@semantic-release/npm",
-      "@semantic-release/github"
-    ]
-  },
   "exports": {
     ".": {
       "import": "./dist/index.esm.js",
