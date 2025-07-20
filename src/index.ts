@@ -8,6 +8,11 @@ export {
   ThemeToggle,
   type ThemeToggleProps,
 } from "./components/ThemeToggle/ThemeToggle";
+export {
+  Typography,
+  type TypographyProps,
+  typographyVariants,
+} from "./components/Typography/Typography";
 
 // Theme
 export {
