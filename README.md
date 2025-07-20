@@ -1,148 +1,17 @@
 # Shape UI
 
-React component library for building user interfaces with a focus on accessibility and design consistency.
+A modern React component library built with TypeScript, Tailwind CSS, and Radix UI primitives. Shape UI provides accessible, customizable components with a powerful theming system that supports both light and dark modes.
 
-## 🚀 Deployment
+## ✨ Features
 
-This project uses automated deployment pipelines for both the npm package and Storybook documentation.
-
-### Storybook Deployment
-
-Storybook is automatically deployed to **Netlify** when:
-
-- A new version tag is pushed (e.g., `v1.2.3`)
-- A release is created via semantic-release
-
-**Live Storybook URL**: [Your Netlify URL will appear here after first deployment]
-
-### Deployment Services Used
-
-1. **Netlify** - Hosts the Storybook documentation
-   - Automatic deployments on releases
-   - Custom domain support
-   - CDN and performance optimizations
-
-2. **GitHub Actions** - CI/CD Pipeline
-   - Automated testing and building
-   - Semantic versioning and releases
-   - Storybook deployment triggers
-
-3. **SonarCloud** - Code Quality & Security
-   - Comprehensive code analysis
-   - Security vulnerability scanning
-   - Quality gates for releases
-   - Technical debt tracking
-
-4. **Codecov** - Test Coverage
-   - Detailed coverage reports
-   - Coverage trends and history
-   - PR coverage comments
-   - Coverage badges
-
-### Setup Instructions
-
-#### 1. Netlify Setup
-
-1. Create a Netlify account at [netlify.com](https://netlify.com)
-2. Connect your GitHub repository
-3. Get your Netlify credentials:
-   - **Site ID**: Found in your Netlify dashboard
-   - **Auth Token**: Generate in Netlify user settings
-
-#### 2. SonarCloud Setup
-
-1. Create a SonarCloud account at [sonarcloud.io](https://sonarcloud.io)
-2. Create an organization and project
-3. Get your SonarCloud token from Account > Security
-
-#### 3. Codecov Setup (Optional)
-
-1. Connect your repository at [codecov.io](https://codecov.io)
-2. No additional setup required for public repositories
-
-#### 4. GitHub Secrets
-
-Add these secrets to your GitHub repository (`Settings > Secrets and variables > Actions`):
-
-```
-NETLIFY_AUTH_TOKEN=your_netlify_auth_token
-NETLIFY_SITE_ID=your_netlify_site_id
-NPM_TOKEN=your_npm_token
-SONAR_TOKEN=your_sonarcloud_token
-```
-
-#### 5. NPM Token Setup
-
-1. Create an NPM token with publish permissions
-2. Add it to GitHub secrets as `NPM_TOKEN`
-
-### Deployment Workflow
-
-1. **Development**: Push to `develop` branch triggers CI tests
-2. **Pull Requests**: Triggers CI tests and quality checks (no deployment)
-3. **Release**: Push to `master` branch triggers:
-   - Semantic versioning (if new version is needed)
-   - NPM package publishing (if new version is created)
-   - Storybook deployment to Netlify (if new version is created)
-   - SonarCloud quality gate validation
-4. **Manual**: Use GitHub Actions "workflow_dispatch" to manually trigger deployments
-
-### Deployment Triggers
-
-✅ **Storybook deploys when:**
-
-- Code is merged to master AND semantic-release creates a new version
-- Manual trigger via GitHub Actions
-
-❌ **Storybook does NOT deploy when:**
-
-- Pull requests are opened/updated
-- Code is pushed to feature branches
-- Code is merged to master but no new version is needed
-
-### Manual Deployment
-
-To manually deploy Storybook:
-
-```bash
-# Build Storybook locally
-npm run build-storybook:ci
-
-# Deploy to Netlify (if you have Netlify CLI)
-netlify deploy --prod --dir=storybook-static
-```
-
-### Alternative Deployment Services
-
-If you prefer other services, here are alternatives:
-
-#### Vercel
-
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel --prod
-```
-
-#### GitHub Pages
-
-```bash
-# Add to package.json scripts
-"deploy-storybook": "storybook-to-ghpages"
-
-# Deploy
-npm run deploy-storybook
-```
-
-#### AWS S3 + CloudFront
-
-```bash
-# Install AWS CLI and configure
-aws s3 sync storybook-static/ s3://your-bucket-name
-aws cloudfront create-invalidation --distribution-id YOUR_DISTRIBUTION_ID --paths "/*"
-```
+- **🎨 Modern Design**: Clean, accessible components built with Tailwind CSS
+- **🌙 Dark Mode Support**: Built-in light/dark theme switching with system preference detection
+- **🎯 TypeScript First**: Full TypeScript support with excellent type safety
+- **♿ Accessibility**: Built on Radix UI primitives for excellent accessibility
+- **🎭 Variant System**: Flexible component variants using Class Variance Authority (CVA)
+- **🎪 Customizable Theming**: Easy theme customization with CSS variables
+- **📱 Responsive**: Mobile-first responsive design
+- **🔧 Zero Runtime**: No runtime overhead, pure CSS-in-JS solution
 
 ## 📦 Installation
 
@@ -150,33 +19,225 @@ aws cloudfront create-invalidation --distribution-id YOUR_DISTRIBUTION_ID --path
 npm install @im10anish/shape-ui
 ```
 
-## 🎨 Usage
+## 🚀 Quick Start
+
+### 1. Set up your theme provider
 
 ```tsx
-import { Button } from "@im10anish/shape-ui";
+import { ThemeProvider } from "@im10anish/shape-ui";
 
 function App() {
-  return <Button>Click me</Button>;
+  return (
+    <ThemeProvider defaultColorMode="system">
+      <YourApp />
+    </ThemeProvider>
+  );
 }
 ```
+
+### 2. Import and use components
+
+```tsx
+import { Button, Typography } from "@im10anish/shape-ui";
+
+function MyComponent() {
+  return (
+    <div>
+      <Typography variant="h1">Welcome to Shape UI</Typography>
+      <Button variant="default" size="lg">
+        Get Started
+      </Button>
+    </div>
+  );
+}
+```
+
+## 🎨 Component Pattern
+
+Shape UI follows a consistent pattern for all components:
+
+### Variant System with CVA
+
+All components use Class Variance Authority (CVA) for flexible styling:
+
+```tsx
+import { cva, type VariantProps } from "class-variance-authority";
+
+const buttonVariants = cva("base-styles", {
+  variants: {
+    variant: {
+      default: "bg-primary text-primary-foreground",
+      destructive: "bg-destructive text-destructive-foreground",
+      outline: "border border-input bg-background",
+    },
+    size: {
+      default: "h-10 px-4 py-2",
+      sm: "h-9 px-3",
+      lg: "h-11 px-8",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+    size: "default",
+  },
+});
+```
+
+### Component Structure
+
+```tsx
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "../../lib/utils";
+
+// Define variants
+const componentVariants = cva("base-classes", {
+  variants: {
+    // Your variants here
+  },
+  defaultVariants: {
+    // Default variants
+  },
+});
+
+// Component interface
+export interface ComponentProps
+  extends React.HTMLAttributes<HTMLElement>,
+    VariantProps<typeof componentVariants> {
+  asChild?: boolean;
+}
+
+// Component implementation
+const Component = React.forwardRef<HTMLElement, ComponentProps>(
+  ({ className, variant, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "div";
+    return (
+      <Comp
+        className={cn(componentVariants({ variant, className }))}
+        ref={ref}
+        {...props}
+      />
+    );
+  },
+);
+
+Component.displayName = "Component";
+
+export { Component, componentVariants };
+```
+
+## 🎨 Theming System
+
+Shape UI provides a powerful theming system that supports:
+
+- **Light/Dark Mode**: Automatic theme switching
+- **Custom Colors**: Easy color palette customization
+- **CSS Variables**: Runtime theme updates
+- **System Preferences**: Automatic dark mode detection
+
+### Creating a Custom Theme
+
+```tsx
+import { createTheme, ThemeProvider } from "@im10anish/shape-ui";
+
+const customTheme = createTheme({
+  colors: {
+    primary: {
+      DEFAULT: "#3b82f6",
+      50: "#eff6ff",
+      500: "#3b82f6",
+      900: "#1e3a8a",
+    },
+    // ... more colors
+  },
+  borderRadius: {
+    lg: "12px",
+    xl: "16px",
+  },
+  // ... other theme properties
+});
+
+function App() {
+  return (
+    <ThemeProvider theme={customTheme} defaultColorMode="system">
+      <YourApp />
+    </ThemeProvider>
+  );
+}
+```
+
+### Using Theme Hooks
+
+```tsx
+import { useTheme } from "@im10anish/shape-ui";
+
+function ThemeToggle() {
+  const { colorMode, toggleColorMode } = useTheme();
+
+  return <button onClick={toggleColorMode}>Current mode: {colorMode}</button>;
+}
+```
+
+## 📚 Components
+
+Shape UI provides a growing collection of accessible, customizable components. Each component follows our consistent design patterns and supports the theming system.
+
+For the complete list of available components and their detailed API documentation, visit our [Storybook documentation](https://shape-ui.netlify.app/).
+
+### Component Features
+
+- **Consistent API**: All components follow the same variant and prop patterns
+- **TypeScript Support**: Full type safety with excellent IntelliSense
+- **Accessibility**: Built on Radix UI primitives for excellent a11y
+- **Themeable**: All components respect your custom theme configuration
+- **Responsive**: Mobile-first design that works on all screen sizes
+
+## 🛠️ Dependencies
+
+Shape UI is built with these core technologies:
+
+### Core Dependencies
+
+- **React** (>=16.8.0) - UI framework
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Utility-first CSS framework
+- **Radix UI** - Accessible UI primitives
+
+### Key Libraries
+
+- **class-variance-authority** - Component variant system
+- **clsx** - Conditional className utility
+- **tailwind-merge** - Tailwind class merging
+- **lucide-react** - Icon library
+
+### Development Tools
+
+- **Storybook** - Component documentation
+- **Jest** - Testing framework
+- **Rollup** - Build tool
+- **ESLint** - Code linting
 
 ## 🧪 Testing
 
 ```bash
+# Run tests
 npm test
+
+# Run tests with coverage
 npm run test:coverage
+
+# Run tests in watch mode
+npm run test:watch
 ```
 
-## 📚 Documentation
+## 📖 Documentation
 
-Visit our [Storybook](https://your-netlify-url.netlify.app) for interactive component documentation and examples.
-
-## 🔍 Code Quality
-
-- **SonarCloud**: [View Analysis](https://sonarcloud.io/project/overview?id=Im10anish_shape-ui)
-- **Codecov**: [View Coverage](https://codecov.io/gh/Im10anish/shape-ui)
+For detailed component documentation and interactive examples, visit our [Storybook](https://shape-ui.netlify.app/).
 
 ## 🤝 Contributing
+
+We welcome contributions! Please see our [contributing guide](CONTRIBUTING.md) for details.
 
 1. Fork the repository
 2. Create a feature branch
@@ -186,4 +247,11 @@ Visit our [Storybook](https://your-netlify-url.netlify.app) for interactive comp
 
 ## 📄 License
 
-MIT
+MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🔗 Links
+
+- [GitHub Repository](https://github.com/Im10Anish/shape-ui)
+- [NPM Package](https://www.npmjs.com/package/@im10anish/shape-ui)
+- [Storybook Documentation](https://shape-ui.netlify.app/)
+- [Issues](https://github.com/Im10Anish/shape-ui/issues)
