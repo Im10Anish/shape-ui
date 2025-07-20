@@ -3,12 +3,15 @@ name: Deploy Storybook
 on:
   push:
     tags:
-      - "v*" # Trigger on version tags
-  workflow_dispatch: # Allow manual triggers
+      - "v*" # Trigger on version tags only
+  workflow_dispatch: # Allow manual triggers for testing
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    # Only deploy on tags or manual dispatch, never on PRs
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout code

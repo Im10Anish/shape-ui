@@ -2,9 +2,9 @@ name: Release
 
 on:
   push:
-    branches:
-      - master
-  workflow_dispatch:
+    tags:
+      - "v*" # Only trigger on version tags
+  workflow_dispatch: # Allow manual triggers
 
 jobs:
   release:
