@@ -5,6 +5,11 @@ export {
   buttonVariants,
 } from "./components/Button/Button";
 export {
+  Skeleton,
+  type SkeletonProps,
+  skeletonVariants,
+} from "./components/Skeleton/Skeleton";
+export {
   ThemeToggle,
   type ThemeToggleProps,
 } from "./components/ThemeToggle/ThemeToggle";
