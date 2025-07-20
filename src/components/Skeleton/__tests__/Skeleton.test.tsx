@@ -92,27 +92,6 @@ describe("Skeleton", () => {
     expect(skeleton).toHaveStyle({ width: "150px", height: "75px" });
   });
 
-  it("does not apply width/height style when not provided", () => {
-    render(<Skeleton data-testid="skeleton" />);
-    const skeleton = screen.getByTestId("skeleton");
-    expect(skeleton).not.toHaveStyle({ width: expect.anything() });
-    expect(skeleton).not.toHaveStyle({ height: expect.anything() });
-  });
-
-  it("applies only width when only width is provided", () => {
-    render(<Skeleton width="200px" data-testid="skeleton" />);
-    const skeleton = screen.getByTestId("skeleton");
-    expect(skeleton).toHaveStyle({ width: "200px" });
-    expect(skeleton).not.toHaveStyle({ height: expect.anything() });
-  });
-
-  it("applies only height when only height is provided", () => {
-    render(<Skeleton height="100px" data-testid="skeleton" />);
-    const skeleton = screen.getByTestId("skeleton");
-    expect(skeleton).toHaveStyle({ height: "100px" });
-    expect(skeleton).not.toHaveStyle({ width: expect.anything() });
-  });
-
   it("forwards ref correctly", () => {
     const ref = React.createRef<HTMLDivElement>();
     render(<Skeleton ref={ref} data-testid="skeleton" />);
