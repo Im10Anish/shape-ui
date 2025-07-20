@@ -2,18 +2,13 @@ name: Release
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
   release:
     runs-on: ubuntu-latest
-
-    # Add explicit permissions
-    permissions:
-      contents: write # For creating releases
-      issues: write # For creating issues
-      pull-requests: write # For creating PRs
-      packages: write # For publishing packages
 
     steps:
       - name: Checkout code
@@ -22,28 +17,75 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Use Node.js 20
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
+          node-version: "18"
           cache: "npm"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run tests
-        run: npm run test
+        run: npm run test:coverage
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: SonarCloud Quality Gate
+        uses: SonarSource/sonarcloud-github-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Type check
+        run: npm run type-check
 
       - name: Build library
         run: npm run build
-
-      - name: Build Storybook
-        run: npm run build-storybook
-        env:
-          NODE_ENV: production
 
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release
+        run: npm run release
+
+  # This job will be triggered after a successful release
+  deploy-storybook:
+    needs: release
+    runs-on: ubuntu-latest
+    if: needs.release.outputs.new_release_published == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Storybook
+        run: npm run build-storybook:ci
+        env:
+          NODE_OPTIONS: "--openssl-legacy-provider --max-old-space-size=8192"
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v3.0
+        with:
+          publish-dir: "./storybook-static"
+          production-branch: master
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy Storybook for ${{ needs.release.outputs.new_release_version }}"
+          enable-pull-request-comment: false
+          enable-commit-comment: true
+          overwrites-pull-request-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 1
