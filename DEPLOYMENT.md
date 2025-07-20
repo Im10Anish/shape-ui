@@ -94,23 +94,21 @@ Add these secrets in your GitHub repository (`Settings > Secrets and variables >
 
 The following triggers will automatically deploy Storybook:
 
-1. **Version Tags**: Push a tag like `v1.2.3`
-2. **Semantic Release**: When semantic-release creates a new version
-3. **Manual Trigger**: Use GitHub Actions "workflow_dispatch"
+1. **Master Branch Push**: When code is merged to master (if semantic-release creates a new version)
+2. **Manual Trigger**: Use GitHub Actions "workflow_dispatch"
 
 ### Deployment Triggers (What DOES deploy)
 
 ✅ **Deployments happen when:**
 
-- A version tag is pushed (e.g., `git tag v1.2.3 && git push origin v1.2.3`)
-- Semantic-release creates a new version on master
+- Code is merged to master AND semantic-release creates a new version
 - Manual trigger via GitHub Actions
 
 ❌ **Deployments do NOT happen when:**
 
 - Pull requests are opened/updated
 - Code is pushed to feature branches
-- Code is merged to master (without semantic-release)
+- Code is merged to master but no new version is needed
 
 ### Workflow Files
 
@@ -119,14 +117,11 @@ The following triggers will automatically deploy Storybook:
   - **SonarCloud scan** for code quality
   - **Codecov upload** for coverage reports
   - **Builds Storybook for testing** (does not deploy)
-- **`.github/workflows/release.yml`**: Handles releases and triggers deployment
-  - **Only triggers on version tags**
+- **`.github/workflows/release.yml`**: Handles releases and deployment
+  - **Triggers on master branch pushes**
   - **SonarCloud Quality Gate** for release validation
   - Semantic versioning and NPM publishing
-  - Storybook deployment to Netlify
-- **`.github/workflows/deploy-storybook.yml`**: Dedicated Storybook deployment
-  - **Only triggers on version tags or manual dispatch**
-  - Standalone deployment option
+  - **Storybook deployment to Netlify** (only if new version is created)
 
 ## 🛠️ Manual Deployment
 
