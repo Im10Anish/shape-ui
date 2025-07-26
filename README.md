@@ -119,7 +119,7 @@ const Component = React.forwardRef<HTMLElement, ComponentProps>(
         {...props}
       />
     );
-  },
+  }
 );
 
 Component.displayName = "Component";
@@ -183,7 +183,7 @@ function ThemeToggle() {
 
 Shape UI provides a growing collection of accessible, customizable components. Each component follows our consistent design patterns and supports the theming system.
 
-For the complete list of available components and their detailed API documentation, visit our [Storybook documentation](https://shape-ui.netlify.app/).
+For the complete list of available components and their detailed API documentation, visit our [professional documentation site](https://shape-ui-docs.netlify.app/) or [Storybook documentation](https://shape-ui.netlify.app/).
 
 ### Component Features
 
@@ -233,6 +233,20 @@ npm run test:watch
 
 ## 📖 Documentation
 
+We provide two documentation options:
+
+### 🌐 Professional Documentation Site
+
+Visit our [professional documentation site](https://shape-ui-docs.netlify.app/) for:
+
+- Interactive component examples
+- Detailed API references
+- Installation and setup guides
+- Theming documentation
+- Best practices and examples
+
+### 📖 Storybook Documentation
+
 For detailed component documentation and interactive examples, visit our [Storybook](https://shape-ui.netlify.app/).
 
 ## 🤝 Contributing
@@ -253,5 +267,6 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 - [GitHub Repository](https://github.com/Im10Anish/shape-ui)
 - [NPM Package](https://www.npmjs.com/package/@im10anish/shape-ui)
+- [Professional Documentation](https://shape-ui-docs.netlify.app/)
 - [Storybook Documentation](https://shape-ui.netlify.app/)
 - [Issues](https://github.com/Im10Anish/shape-ui/issues)

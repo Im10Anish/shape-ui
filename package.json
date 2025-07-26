@@ -14,9 +14,11 @@
   },
   "scripts": {
     "dev": "storybook dev -p 6006",
+    "dev:docs": "cd docs && npm run dev",
     "build": "rollup -c",
     "build-storybook": "storybook build",
     "build-storybook:ci": "NODE_OPTIONS='--openssl-legacy-provider --max-old-space-size=8192' storybook build",
+    "build-docs": "cd docs && npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -27,7 +29,9 @@
     "prepublishOnly": "npm run build && npm run test",
     "release": "semantic-release",
     "deploy-storybook": "npm run build-storybook:ci && netlify deploy --prod --dir=storybook-static",
-    "deploy-storybook:preview": "npm run build-storybook:ci && netlify deploy --dir=storybook-static"
+    "deploy-storybook:preview": "npm run build-storybook:ci && netlify deploy --dir=storybook-static",
+    "deploy-docs": "npm run build-docs && netlify deploy --prod --dir=docs/.next",
+    "deploy-docs:preview": "npm run build-docs && netlify deploy --dir=docs/.next"
   },
   "keywords": [
     "react",
