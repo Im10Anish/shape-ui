@@ -172,6 +172,12 @@ export const LoadingStates: Story = {
         <Avatar alt="Jane Smith" size="lg" />
         <Avatar alt="Bob Johnson" size="xl" />
       </div>
+      <div className="flex gap-2 items-center">
+        <span className="text-sm font-medium w-20">Shadow:</span>
+        <Avatar alt="John Doe" shadow="sm" />
+        <Avatar alt="Jane Smith" size="lg" shadow="md" />
+        <Avatar alt="Bob Johnson" size="xl" shadow="lg" />
+      </div>
     </div>
   ),
   parameters: {

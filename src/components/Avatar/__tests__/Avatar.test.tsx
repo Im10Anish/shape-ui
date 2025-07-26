@@ -330,4 +330,51 @@ describe("Avatar", () => {
     expect(screen.getByTestId("skeleton")).toBeInTheDocument();
     expect(screen.queryByText("JD")).not.toBeInTheDocument();
   });
+
+  it("applies shadow classes correctly", () => {
+    render(<Avatar shadow="lg" />);
+    const avatar = document.querySelector('[class*="shadow-lg"]');
+    expect(avatar).toHaveClass("shadow-lg");
+  });
+
+  it("applies different shadow variants", () => {
+    const { rerender } = render(<Avatar shadow="sm" />);
+    expect(document.querySelector('[class*="shadow-sm"]')).toHaveClass(
+      "shadow-sm",
+    );
+
+    rerender(<Avatar shadow="xl" />);
+    expect(document.querySelector('[class*="shadow-xl"]')).toHaveClass(
+      "shadow-xl",
+    );
+
+    rerender(<Avatar shadow="2xl" />);
+    expect(document.querySelector('[class*="shadow-2xl"]')).toHaveClass(
+      "shadow-2xl",
+    );
+
+    rerender(<Avatar shadow="inner" />);
+    expect(document.querySelector('[class*="shadow-inner"]')).toHaveClass(
+      "shadow-inner",
+    );
+  });
+
+  it("has no shadow by default", () => {
+    render(<Avatar />);
+    const avatar = document.querySelector('[class*="h-10"]');
+    expect(avatar).not.toHaveClass(
+      "shadow-sm",
+      "shadow-md",
+      "shadow-lg",
+      "shadow-xl",
+      "shadow-2xl",
+      "shadow-inner",
+    );
+  });
+
+  it("combines shadow with size correctly", () => {
+    render(<Avatar size="xl" shadow="md" />);
+    const avatar = document.querySelector('[class*="h-16"]');
+    expect(avatar).toHaveClass("h-16", "w-16", "shadow-md");
+  });
 });

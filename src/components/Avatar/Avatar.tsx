@@ -2,6 +2,7 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../lib/utils";
 import { Skeleton } from "../Skeleton/Skeleton";
+import { type ShadowVariant } from "../../lib/shadows";
 
 const avatarVariants = cva(
   "relative flex shrink-0 overflow-hidden rounded-full",
@@ -15,9 +16,19 @@ const avatarVariants = cva(
         xl: "h-16 w-16",
         "2xl": "h-20 w-20",
       },
+      shadow: {
+        none: "",
+        sm: "shadow-sm",
+        md: "shadow-md",
+        lg: "shadow-lg",
+        xl: "shadow-xl",
+        "2xl": "shadow-2xl",
+        inner: "shadow-inner",
+      },
     },
     defaultVariants: {
       size: "md",
+      shadow: "none",
     },
   },
 );
@@ -66,6 +77,7 @@ export interface AvatarProps
   loading?: boolean;
   onImageLoad?: () => void;
   onImageError?: () => void;
+  shadow?: ShadowVariant;
 }
 
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
@@ -73,6 +85,7 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
     {
       className,
       size,
+      shadow,
       src,
       alt,
       fallback,
@@ -123,13 +136,12 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
     if (loading) {
       return (
         <div
-          className={cn(avatarVariants({ size, className }))}
+          className={cn(avatarVariants({ size, shadow, className }))}
           ref={ref}
           {...props}
         >
           <Skeleton
             className="h-full w-full rounded-full absolute inset-0"
-            style={{ width: "100%", height: "100%" }}
             data-testid="skeleton"
           />
           {src && (
@@ -151,7 +163,7 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
 
     return (
       <div
-        className={cn(avatarVariants({ size, className }))}
+        className={cn(avatarVariants({ size, shadow, className }))}
         ref={ref}
         {...props}
       >

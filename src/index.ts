@@ -57,6 +57,7 @@ export type {
 
 // Utilities
 export { cn } from "./lib/utils";
+export { shadowVariants, type ShadowVariant } from "./lib/shadows";
 
 // Export styles for consumers
 import "./styles/globals.css";

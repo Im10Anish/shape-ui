@@ -76,6 +76,7 @@ export const AllVariants: Story = {
         <Skeleton size="default" />
         <Skeleton size="lg" />
         <Skeleton size="xl" />
+        <Skeleton size="xl" shadow="sm" />
       </div>
     </div>
   ),

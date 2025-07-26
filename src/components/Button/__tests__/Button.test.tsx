@@ -193,4 +193,50 @@ describe("Button", () => {
     expect(button).toHaveAttribute("type", "submit");
     expect(button).toHaveAttribute("form", "test-form");
   });
+
+  it("applies shadow classes correctly", () => {
+    render(<Button shadow="lg">Shadow Button</Button>);
+    const button = screen.getByRole("button");
+    expect(button).toHaveClass("shadow-lg");
+  });
+
+  it("applies different shadow variants", () => {
+    const { rerender } = render(<Button shadow="sm">Small Shadow</Button>);
+    expect(screen.getByRole("button")).toHaveClass("shadow-sm");
+
+    rerender(<Button shadow="xl">Large Shadow</Button>);
+    expect(screen.getByRole("button")).toHaveClass("shadow-xl");
+
+    rerender(<Button shadow="2xl">Extra Large Shadow</Button>);
+    expect(screen.getByRole("button")).toHaveClass("shadow-2xl");
+
+    rerender(<Button shadow="inner">Inner Shadow</Button>);
+    expect(screen.getByRole("button")).toHaveClass("shadow-inner");
+  });
+
+  it("has no shadow by default", () => {
+    render(<Button>Default Button</Button>);
+    const button = screen.getByRole("button");
+    expect(button).not.toHaveClass(
+      "shadow-sm",
+      "shadow-md",
+      "shadow-lg",
+      "shadow-xl",
+      "shadow-2xl",
+      "shadow-inner",
+    );
+  });
+
+  it("combines shadow with other variants correctly", () => {
+    render(
+      <Button variant="outline" size="lg" shadow="md">
+        Combined Shadow Button
+      </Button>,
+    );
+    const button = screen.getByRole("button");
+
+    expect(button).toHaveClass("border", "border-input", "bg-background");
+    expect(button).toHaveClass("h-11", "px-8");
+    expect(button).toHaveClass("shadow-md");
+  });
 });

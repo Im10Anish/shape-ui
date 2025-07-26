@@ -196,4 +196,53 @@ describe("Skeleton", () => {
     rerender(<Skeleton size="xl" data-testid="skeleton" />);
     expect(screen.getByTestId("skeleton")).toHaveClass("h-12");
   });
+
+  it("applies shadow classes correctly", () => {
+    render(<Skeleton shadow="lg" data-testid="skeleton" />);
+    const skeleton = screen.getByTestId("skeleton");
+    expect(skeleton).toHaveClass("shadow-lg");
+  });
+
+  it("applies different shadow variants", () => {
+    const { rerender } = render(
+      <Skeleton shadow="sm" data-testid="skeleton" />,
+    );
+    expect(screen.getByTestId("skeleton")).toHaveClass("shadow-sm");
+
+    rerender(<Skeleton shadow="xl" data-testid="skeleton" />);
+    expect(screen.getByTestId("skeleton")).toHaveClass("shadow-xl");
+
+    rerender(<Skeleton shadow="2xl" data-testid="skeleton" />);
+    expect(screen.getByTestId("skeleton")).toHaveClass("shadow-2xl");
+
+    rerender(<Skeleton shadow="inner" data-testid="skeleton" />);
+    expect(screen.getByTestId("skeleton")).toHaveClass("shadow-inner");
+  });
+
+  it("has no shadow by default", () => {
+    render(<Skeleton data-testid="skeleton" />);
+    const skeleton = screen.getByTestId("skeleton");
+    expect(skeleton).not.toHaveClass(
+      "shadow-sm",
+      "shadow-md",
+      "shadow-lg",
+      "shadow-xl",
+      "shadow-2xl",
+      "shadow-inner",
+    );
+  });
+
+  it("combines shadow with variant and size correctly", () => {
+    render(
+      <Skeleton
+        variant="primary"
+        size="lg"
+        shadow="md"
+        data-testid="skeleton"
+      />,
+    );
+    const skeleton = screen.getByTestId("skeleton");
+
+    expect(skeleton).toHaveClass("bg-primary/20", "h-8", "shadow-md");
+  });
 });
