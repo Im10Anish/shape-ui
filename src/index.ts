@@ -1,5 +1,12 @@
 // Components
 export {
+  Avatar,
+  type AvatarProps,
+  avatarVariants,
+  avatarImageVariants,
+  avatarFallbackVariants,
+} from "./components/Avatar/Avatar";
+export {
   Button,
   type ButtonProps,
   buttonVariants,
