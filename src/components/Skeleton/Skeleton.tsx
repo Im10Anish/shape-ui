@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../lib/utils";
+import { type ShadowVariant } from "../../lib/shadows";
 
 const skeletonVariants = cva("animate-pulse rounded-md bg-muted", {
   variants: {
@@ -16,10 +17,20 @@ const skeletonVariants = cva("animate-pulse rounded-md bg-muted", {
       lg: "h-8 w-48",
       xl: "h-12 w-64",
     },
+    shadow: {
+      none: "",
+      sm: "shadow-sm",
+      md: "shadow-md",
+      lg: "shadow-lg",
+      xl: "shadow-xl",
+      "2xl": "shadow-2xl",
+      inner: "shadow-inner",
+    },
   },
   defaultVariants: {
     variant: "default",
     size: "default",
+    shadow: "none",
   },
 });
 
@@ -28,10 +39,14 @@ export interface SkeletonProps
     VariantProps<typeof skeletonVariants> {
   width?: string | number;
   height?: string | number;
+  shadow?: ShadowVariant;
 }
 
 const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
-  ({ className, variant, size, width, height, style, ...props }, ref) => {
+  (
+    { className, variant, size, shadow, width, height, style, ...props },
+    ref,
+  ) => {
     const hasCustomDimensions = width !== undefined || height !== undefined;
     const customStyle = hasCustomDimensions
       ? {
@@ -42,7 +57,7 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
       : style;
 
     const elementProps = {
-      className: cn(skeletonVariants({ variant, size, className })),
+      className: cn(skeletonVariants({ variant, size, shadow, className })),
       ref,
       ...(customStyle && { style: customStyle }),
       ...props,

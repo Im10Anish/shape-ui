@@ -165,6 +165,9 @@ export const AllVariants: Story = {
         <Button variant="outline" disabled>
           Disabled Outline
         </Button>
+        <Button variant="ghost" disabled shadow="md">
+          With Shadow
+        </Button>
       </div>
     </div>
   ),

@@ -1,5 +1,12 @@
 // Components
 export {
+  Avatar,
+  type AvatarProps,
+  avatarVariants,
+  avatarImageVariants,
+  avatarFallbackVariants,
+} from "./components/Avatar/Avatar";
+export {
   Button,
   type ButtonProps,
   buttonVariants,
@@ -50,6 +57,7 @@ export type {
 
 // Utilities
 export { cn } from "./lib/utils";
+export { shadowVariants, type ShadowVariant } from "./lib/shadows";
 
 // Export styles for consumers
 import "./styles/globals.css";
