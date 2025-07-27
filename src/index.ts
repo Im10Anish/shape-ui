@@ -25,6 +25,13 @@ export {
   type TypographyProps,
   typographyVariants,
 } from "./components/Typography/Typography";
+export {
+  Badge,
+  type BadgeProps,
+  badgeVariants,
+  badgeContentVariants,
+  badgeIconVariants,
+} from "./components/Badge/Badge";
 
 // Theme
 export {
