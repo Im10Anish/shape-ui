@@ -1,6 +1,6 @@
 {
   "name": "@im10anish/shape-ui",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "React component library for building user interfaces with a focus on accessibility and design consistency.",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
