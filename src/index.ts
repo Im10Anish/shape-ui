@@ -32,6 +32,11 @@ export {
   badgeContentVariants,
   badgeIconVariants,
 } from "./components/Badge/Badge";
+export {
+  Input,
+  type InputProps,
+  inputVariants,
+} from "./components/Input/Input";
 
 // Theme
 export {
