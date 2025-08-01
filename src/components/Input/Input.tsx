@@ -70,13 +70,17 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const [showPassword, setShowPassword] = React.useState(false);
     const [inputType, setInputType] = React.useState(type);
 
+    const isPasswordWithToggle = type === "password" && showPasswordToggle;
+    const hasRightContent =
+      rightIcon || error || success || isPasswordWithToggle;
+
     React.useEffect(() => {
-      if (type === "password" && showPasswordToggle) {
+      if (isPasswordWithToggle) {
         setInputType(showPassword ? "text" : "password");
       } else {
         setInputType(type);
       }
-    }, [type, showPassword, showPasswordToggle]);
+    }, [type, showPassword, isPasswordWithToggle]);
 
     const handlePasswordToggle = () => {
       setShowPassword(!showPassword);
@@ -88,28 +92,40 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       return "default";
     };
 
-    const renderRightIcon = () => {
+    const renderPasswordToggle = () => {
+      return (
+        <button
+          type="button"
+          onClick={handlePasswordToggle}
+          className="text-muted-foreground hover:text-foreground transition-colors"
+          disabled={disabled}
+        >
+          {showPassword ? (
+            <EyeOff className="h-4 w-4" />
+          ) : (
+            <Eye className="h-4 w-4" />
+          )}
+        </button>
+      );
+    };
+
+    const renderStatusIcon = () => {
       if (error) {
         return <AlertCircle className="h-4 w-4 text-destructive" />;
       }
       if (success) {
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       }
-      if (type === "password" && showPasswordToggle) {
-        return (
-          <button
-            type="button"
-            onClick={handlePasswordToggle}
-            className="text-muted-foreground hover:text-foreground transition-colors"
-            disabled={disabled}
-          >
-            {showPassword ? (
-              <EyeOff className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
-          </button>
-        );
+      return null;
+    };
+
+    const renderRightIcon = () => {
+      const statusIcon = renderStatusIcon();
+      if (statusIcon) {
+        return statusIcon;
+      }
+      if (isPasswordWithToggle) {
+        return renderPasswordToggle();
       }
       return rightIcon;
     };
@@ -137,21 +153,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className={cn(
               inputVariants({ variant, size, state: getState() }),
               leftIcon && "pl-10",
-              (rightIcon ||
-                error ||
-                success ||
-                (type === "password" && showPasswordToggle)) &&
-                "pr-10",
+              hasRightContent && "pr-10",
               className,
             )}
             ref={ref}
             disabled={disabled}
             {...props}
           />
-          {(rightIcon ||
-            error ||
-            success ||
-            (type === "password" && showPasswordToggle)) && (
+          {hasRightContent && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
               {renderRightIcon()}
             </div>
