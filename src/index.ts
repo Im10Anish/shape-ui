@@ -37,6 +37,26 @@ export {
   type InputProps,
   inputVariants,
 } from "./components/Input/Input";
+export {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+  type CardProps,
+  type CardHeaderProps,
+  type CardTitleProps,
+  type CardDescriptionProps,
+  type CardContentProps,
+  type CardFooterProps,
+  cardVariants,
+  cardHeaderVariants,
+  cardTitleVariants,
+  cardDescriptionVariants,
+  cardContentVariants,
+  cardFooterVariants,
+} from "./components/Card/Card";
 
 // Theme
 export {
