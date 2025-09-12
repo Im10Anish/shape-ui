@@ -57,6 +57,16 @@ export {
   cardContentVariants,
   cardFooterVariants,
 } from "./components/Card/Card";
+export {
+  Table,
+  type TableProps,
+  type TableColumn,
+  type PaginationType,
+  tableVariants,
+  tableHeaderVariants,
+  tableCellVariants,
+  tableContainerVariants,
+} from "./components/Table/Table";
 
 // Theme
 export {

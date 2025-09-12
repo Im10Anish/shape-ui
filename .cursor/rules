@@ -84,6 +84,19 @@ describe("ComponentName", () => {
 });
 ```
 
+### Test Comments & Descriptions
+
+- **NEVER include line numbers in test files**
+- Do not reference specific line numbers in comments (e.g., `// This is line 282`)
+- Do not include line numbers in test descriptions (e.g., `"handles line 282"`)
+- Use descriptive comments that explain functionality, not implementation details
+- Focus on behavior and user interactions rather than code structure
+- Examples of good vs bad comments:
+  - ❌ `// Test line 282: setCurrentPageState(page) in show more branch`
+  - ✅ `// Test setCurrentPageState(page) in show more branch`
+  - ❌ `"handles custom pagination type to trigger line 282"`
+  - ✅ `"handles custom pagination type to trigger else branch"`
+
 ## Build & Development
 
 ### Scripts
