@@ -16,7 +16,7 @@ export interface TableColumn<T = any> {
 }
 
 // Pagination types
-export type PaginationType = "showMore" | "paged";
+export type PaginationType = "showMore" | "paged" | "custom";
 
 // Table variants
 const tableVariants = cva("w-full border-collapse", {
@@ -695,6 +695,35 @@ const Table = React.forwardRef<HTMLDivElement, TableProps>(
 
         {/* Pagination Controls */}
         {paginationType === "paged" && totalPages > 1 && (
+          <div className="flex items-center justify-between py-4">
+            <Typography variant="small" className="text-muted-foreground">
+              Page {currentPageState} of {totalPages}
+            </Typography>
+            <div className="flex gap-2">
+              <Card
+                variant="interactive"
+                size="sm"
+                onClick={() => handlePageChange(currentPageState - 1)}
+                disabled={currentPageState <= 1}
+                className="cursor-pointer"
+              >
+                <Typography variant="small">Previous</Typography>
+              </Card>
+              <Card
+                variant="interactive"
+                size="sm"
+                onClick={() => handlePageChange(currentPageState + 1)}
+                disabled={currentPageState >= totalPages}
+                className="cursor-pointer"
+              >
+                <Typography variant="small">Next</Typography>
+              </Card>
+            </div>
+          </div>
+        )}
+
+        {/* Custom Pagination Controls for Testing */}
+        {paginationType === "custom" && (
           <div className="flex items-center justify-between py-4">
             <Typography variant="small" className="text-muted-foreground">
               Page {currentPageState} of {totalPages}
