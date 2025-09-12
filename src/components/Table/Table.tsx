@@ -4,6 +4,181 @@ import { cn } from "../../lib/utils";
 import { Card } from "../Card/Card";
 import { Typography } from "../Typography/Typography";
 
+const getTypographySize = (tableSize?: "sm" | "md" | "lg" | null) => {
+  if (tableSize === "sm") return "sm";
+  if (tableSize === "lg") return "lg";
+  return "base";
+};
+
+const getColumnWidthStyle = (
+  columnWidths: number[],
+  columnIndex: number,
+  showRowNumbers: boolean,
+) => {
+  const actualIndex = columnIndex + (showRowNumbers ? 1 : 0);
+  const width = columnWidths[actualIndex];
+  return width ? { width: `${width}px`, minWidth: `${width}px` } : {};
+};
+
+const getStickyColumnIndex = (
+  columns: TableColumn[],
+  stickyLastColumns: number,
+  showRowNumbers: boolean,
+  index: number,
+) => {
+  return columns.length - stickyLastColumns + index + (showRowNumbers ? 1 : 0);
+};
+
+// Reusable header cell component
+interface HeaderCellProps {
+  column: TableColumn;
+  size?: "sm" | "md" | "lg" | null;
+  stickyHeader: boolean;
+  onSort?: (columnId: string, direction: "asc" | "desc") => void;
+  sortColumn?: string;
+  sortDirection?: "asc" | "desc";
+  sticky?: boolean;
+  stickyPosition?: { left?: string; right?: string };
+  widthStyle?: React.CSSProperties;
+}
+
+const HeaderCell: React.FC<HeaderCellProps> = ({
+  column,
+  size = "md",
+  stickyHeader,
+  onSort,
+  sortColumn,
+  sortDirection,
+  sticky = false,
+  stickyPosition,
+  widthStyle,
+}) => (
+  <th
+    className={cn(
+      tableHeaderVariants({
+        size,
+        align: column.align,
+        sticky: stickyHeader,
+      }),
+      column.className,
+      column.width && `w-${column.width}/12`,
+      sticky && "sticky",
+      onSort && column.sortable && "cursor-pointer hover:bg-muted/75",
+    )}
+    style={{
+      ...stickyPosition,
+      ...widthStyle,
+    }}
+    onClick={() => {
+      if (column.sortable && onSort) {
+        const newDirection =
+          sortColumn === column.id && sortDirection === "asc" ? "desc" : "asc";
+        onSort(column.id, newDirection);
+      }
+    }}
+  >
+    <div className="flex items-center gap-2">
+      <Typography variant="small" weight="medium">
+        {column.label}
+      </Typography>
+      {onSort && column.sortable && sortColumn === column.id && (
+        <span className="text-xs">{sortDirection === "asc" ? "↑" : "↓"}</span>
+      )}
+    </div>
+  </th>
+);
+
+// Reusable body cell component
+interface BodyCellProps {
+  column: TableColumn;
+  row: any;
+  rowIndex: number;
+  size?: "sm" | "md" | "lg" | null;
+  sticky?: boolean;
+  stickyPosition?: { left?: string; right?: string };
+  widthStyle?: React.CSSProperties;
+}
+
+const BodyCell: React.FC<BodyCellProps> = ({
+  column,
+  row,
+  rowIndex,
+  size = "md",
+  sticky = false,
+  stickyPosition,
+  widthStyle,
+}) => {
+  const value = (row as any)[column.id];
+
+  const cellContent = column.render ? (
+    column.render(value, row, rowIndex)
+  ) : (
+    <Typography variant="p" size={getTypographySize(size)}>
+      {value || ""}
+    </Typography>
+  );
+
+  return (
+    <td
+      className={cn(
+        tableCellVariants({
+          size,
+          align: column.align,
+          sticky,
+        }),
+        column.className,
+        sticky && "sticky",
+      )}
+      style={{
+        ...stickyPosition,
+        ...widthStyle,
+      }}
+    >
+      {cellContent}
+    </td>
+  );
+};
+
+// Reusable pagination controls component
+interface PaginationControlsProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  loading?: boolean;
+}
+
+const PaginationControls: React.FC<PaginationControlsProps> = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+}) => (
+  <div className="flex items-center justify-between py-4">
+    <Typography variant="small" className="text-muted-foreground">
+      Page {currentPage} of {totalPages}
+    </Typography>
+    <div className="flex gap-2">
+      <Card
+        variant="interactive"
+        size="sm"
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage <= 1}
+        className="cursor-pointer"
+      >
+        <Typography variant="small">Previous</Typography>
+      </Card>
+      <Card
+        variant="interactive"
+        size="sm"
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage >= totalPages}
+        className="cursor-pointer"
+      >
+        <Typography variant="small">Next</Typography>
+      </Card>
+    </div>
+  </div>
+);
+
 // Column configuration interface
 export interface TableColumn<T = any> {
   id: string;
@@ -219,16 +394,11 @@ const Table = React.forwardRef<HTMLDivElement, TableProps>(
         const startIndex = (currentPageState - 1) * pageSize;
         const endIndex = startIndex + pageSize;
         setDisplayData(data.slice(startIndex, endIndex));
-      } else {
-        setDisplayData(data);
-      }
-    }, [data, currentPageState, pageSize, paginationType]);
-
-    // Handle show more pagination
-    React.useEffect(() => {
-      if (paginationType === "showMore") {
+      } else if (paginationType === "showMore") {
         setDisplayData(data.slice(0, currentPageState * pageSize));
         setHasMore(currentPageState * pageSize < data.length);
+      } else {
+        setDisplayData(data);
       }
     }, [data, currentPageState, pageSize, paginationType]);
 
@@ -266,14 +436,6 @@ const Table = React.forwardRef<HTMLDivElement, TableProps>(
       }
     }, [paginationType, onLoadMore, hasMore, loading]);
 
-    const handleSort = (columnId: string) => {
-      if (onSort) {
-        const newDirection =
-          sortColumn === columnId && sortDirection === "asc" ? "desc" : "asc";
-        onSort(columnId, newDirection);
-      }
-    };
-
     const handlePageChange = (page: number) => {
       if (paginationType === "paged") {
         setCurrentPageState(page);
@@ -281,27 +443,6 @@ const Table = React.forwardRef<HTMLDivElement, TableProps>(
       } else {
         setCurrentPageState(page);
       }
-    };
-
-    const renderCell = (
-      column: TableColumn<any>,
-      row: any,
-      rowIndex: number,
-    ) => {
-      const value = (row as any)[column.id];
-
-      if (column.render) {
-        return column.render(value, row, rowIndex);
-      }
-
-      return (
-        <Typography
-          variant="p"
-          size={size === "sm" ? "sm" : size === "lg" ? "lg" : "base"}
-        >
-          {value || ""}
-        </Typography>
-      );
     };
 
     const getStickyFirstColumns = () => {
@@ -407,135 +548,58 @@ const Table = React.forwardRef<HTMLDivElement, TableProps>(
                 </th>
               )}
               {getStickyFirstColumns().map((column, index) => (
-                <th
+                <HeaderCell
                   key={column.id}
-                  className={cn(
-                    tableHeaderVariants({
-                      size,
-                      align: column.align,
-                      sticky: stickyHeader,
-                    }),
-                    column.className,
-                    column.width && `w-${column.width}/12`,
-                    "sticky",
-                    onSort &&
-                      column.sortable &&
-                      "cursor-pointer hover:bg-muted/75",
+                  column={column}
+                  size={size}
+                  stickyHeader={stickyHeader}
+                  onSort={onSort}
+                  sortColumn={sortColumn}
+                  sortDirection={sortDirection}
+                  sticky={true}
+                  stickyPosition={{ left: getStickyColumnLeftPosition(index) }}
+                  widthStyle={getColumnWidthStyle(
+                    columnWidths,
+                    index,
+                    showRowNumbers,
                   )}
-                  style={{
-                    left: getStickyColumnLeftPosition(index),
-                    width: columnWidths[index + (showRowNumbers ? 1 : 0)]
-                      ? `${columnWidths[index + (showRowNumbers ? 1 : 0)]}px`
-                      : undefined,
-                    minWidth: columnWidths[index + (showRowNumbers ? 1 : 0)]
-                      ? `${columnWidths[index + (showRowNumbers ? 1 : 0)]}px`
-                      : undefined,
-                  }}
-                  onClick={() => column.sortable && handleSort(column.id)}
-                >
-                  <div className="flex items-center gap-2">
-                    <Typography variant="small" weight="medium">
-                      {column.label}
-                    </Typography>
-                    {onSort && column.sortable && sortColumn === column.id && (
-                      <span className="text-xs">
-                        {sortDirection === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
-                  </div>
-                </th>
+                />
               ))}
               {getRegularColumns().map((column) => (
-                <th
+                <HeaderCell
                   key={column.id}
-                  className={cn(
-                    tableHeaderVariants({
-                      size,
-                      align: column.align,
-                      sticky: stickyHeader,
-                    }),
-                    column.className,
-                    column.width && `w-${column.width}/12`,
-                    onSort &&
-                      column.sortable &&
-                      "cursor-pointer hover:bg-muted/75",
-                  )}
-                  onClick={() => column.sortable && handleSort(column.id)}
-                >
-                  <div className="flex items-center gap-2">
-                    <Typography variant="small" weight="medium">
-                      {column.label}
-                    </Typography>
-                    {onSort && column.sortable && sortColumn === column.id && (
-                      <span className="text-xs">
-                        {sortDirection === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
-                  </div>
-                </th>
+                  column={column}
+                  size={size}
+                  stickyHeader={stickyHeader}
+                  onSort={onSort}
+                  sortColumn={sortColumn}
+                  sortDirection={sortDirection}
+                />
               ))}
               {getStickyLastColumns().map((column, index) => (
-                <th
+                <HeaderCell
                   key={column.id}
-                  className={cn(
-                    tableHeaderVariants({
-                      size,
-                      align: column.align,
-                      sticky: stickyHeader,
-                    }),
-                    column.className,
-                    column.width && `w-${column.width}/12`,
-                    "sticky",
-                    onSort &&
-                      column.sortable &&
-                      "cursor-pointer hover:bg-muted/75",
-                  )}
-                  style={{
+                  column={column}
+                  size={size}
+                  stickyHeader={stickyHeader}
+                  onSort={onSort}
+                  sortColumn={sortColumn}
+                  sortDirection={sortDirection}
+                  sticky={true}
+                  stickyPosition={{
                     right: getStickyLastColumnRightPosition(index),
-                    width: columnWidths[
-                      columns.length -
-                        stickyLastColumns +
-                        index +
-                        (showRowNumbers ? 1 : 0)
-                    ]
-                      ? `${
-                          columnWidths[
-                            columns.length -
-                              stickyLastColumns +
-                              index +
-                              (showRowNumbers ? 1 : 0)
-                          ]
-                        }px`
-                      : undefined,
-                    minWidth: columnWidths[
-                      columns.length -
-                        stickyLastColumns +
-                        index +
-                        (showRowNumbers ? 1 : 0)
-                    ]
-                      ? `${
-                          columnWidths[
-                            columns.length -
-                              stickyLastColumns +
-                              index +
-                              (showRowNumbers ? 1 : 0)
-                          ]
-                        }px`
-                      : undefined,
                   }}
-                  onClick={() => column.sortable && handleSort(column.id)}
-                >
-                  <div className="flex items-center gap-2">
-                    <Typography variant="small" weight="medium">
-                      {column.label}
-                    </Typography>
-                    {onSort && column.sortable && sortColumn === column.id && (
-                      <span className="text-xs">
-                        {sortDirection === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
-                  </div>
-                </th>
+                  widthStyle={getColumnWidthStyle(
+                    columnWidths,
+                    getStickyColumnIndex(
+                      columns,
+                      stickyLastColumns,
+                      showRowNumbers,
+                      index,
+                    ),
+                    showRowNumbers,
+                  )}
+                />
               ))}
             </tr>
           </thead>
@@ -582,93 +646,54 @@ const Table = React.forwardRef<HTMLDivElement, TableProps>(
                     </td>
                   )}
                   {getStickyFirstColumns().map((column, index) => (
-                    <td
+                    <BodyCell
                       key={column.id}
-                      className={cn(
-                        tableCellVariants({
-                          size,
-                          align: column.align,
-                          sticky: true,
-                        }),
-                        column.className,
-                        "sticky",
-                      )}
-                      style={{
+                      column={column}
+                      row={row}
+                      rowIndex={rowIndex}
+                      size={size}
+                      sticky={true}
+                      stickyPosition={{
                         left: getStickyColumnLeftPosition(index),
-                        width: columnWidths[index + (showRowNumbers ? 1 : 0)]
-                          ? `${
-                              columnWidths[index + (showRowNumbers ? 1 : 0)]
-                            }px`
-                          : undefined,
-                        minWidth: columnWidths[index + (showRowNumbers ? 1 : 0)]
-                          ? `${
-                              columnWidths[index + (showRowNumbers ? 1 : 0)]
-                            }px`
-                          : undefined,
                       }}
-                    >
-                      {renderCell(column, row, rowIndex)}
-                    </td>
+                      widthStyle={getColumnWidthStyle(
+                        columnWidths,
+                        index,
+                        showRowNumbers,
+                      )}
+                    />
                   ))}
                   {getRegularColumns().map((column) => (
-                    <td
+                    <BodyCell
                       key={column.id}
-                      className={cn(
-                        tableCellVariants({ size, align: column.align }),
-                        column.className,
-                      )}
-                    >
-                      {renderCell(column, row, rowIndex)}
-                    </td>
+                      column={column}
+                      row={row}
+                      rowIndex={rowIndex}
+                      size={size}
+                    />
                   ))}
                   {getStickyLastColumns().map((column, index) => (
-                    <td
+                    <BodyCell
                       key={column.id}
-                      className={cn(
-                        tableCellVariants({
-                          size,
-                          align: column.align,
-                          sticky: true,
-                        }),
-                        column.className,
-                        "sticky",
-                      )}
-                      style={{
+                      column={column}
+                      row={row}
+                      rowIndex={rowIndex}
+                      size={size}
+                      sticky={true}
+                      stickyPosition={{
                         right: getStickyLastColumnRightPosition(index),
-                        width: columnWidths[
-                          columns.length -
-                            stickyLastColumns +
-                            index +
-                            (showRowNumbers ? 1 : 0)
-                        ]
-                          ? `${
-                              columnWidths[
-                                columns.length -
-                                  stickyLastColumns +
-                                  index +
-                                  (showRowNumbers ? 1 : 0)
-                              ]
-                            }px`
-                          : undefined,
-                        minWidth: columnWidths[
-                          columns.length -
-                            stickyLastColumns +
-                            index +
-                            (showRowNumbers ? 1 : 0)
-                        ]
-                          ? `${
-                              columnWidths[
-                                columns.length -
-                                  stickyLastColumns +
-                                  index +
-                                  (showRowNumbers ? 1 : 0)
-                              ]
-                            }px`
-                          : undefined,
                       }}
-                    >
-                      {renderCell(column, row, rowIndex)}
-                    </td>
+                      widthStyle={getColumnWidthStyle(
+                        columnWidths,
+                        getStickyColumnIndex(
+                          columns,
+                          stickyLastColumns,
+                          showRowNumbers,
+                          index,
+                        ),
+                        showRowNumbers,
+                      )}
+                    />
                   ))}
                 </tr>
               ))
@@ -682,7 +707,10 @@ const Table = React.forwardRef<HTMLDivElement, TableProps>(
             <Card
               variant="interactive"
               size="sm"
-              onClick={onLoadMore}
+              onClick={() => {
+                setCurrentPageState((prev) => prev + 1);
+                onLoadMore?.();
+              }}
               disabled={loading}
               className="cursor-pointer"
             >
@@ -695,60 +723,22 @@ const Table = React.forwardRef<HTMLDivElement, TableProps>(
 
         {/* Pagination Controls */}
         {paginationType === "paged" && totalPages > 1 && (
-          <div className="flex items-center justify-between py-4">
-            <Typography variant="small" className="text-muted-foreground">
-              Page {currentPageState} of {totalPages}
-            </Typography>
-            <div className="flex gap-2">
-              <Card
-                variant="interactive"
-                size="sm"
-                onClick={() => handlePageChange(currentPageState - 1)}
-                disabled={currentPageState <= 1}
-                className="cursor-pointer"
-              >
-                <Typography variant="small">Previous</Typography>
-              </Card>
-              <Card
-                variant="interactive"
-                size="sm"
-                onClick={() => handlePageChange(currentPageState + 1)}
-                disabled={currentPageState >= totalPages}
-                className="cursor-pointer"
-              >
-                <Typography variant="small">Next</Typography>
-              </Card>
-            </div>
-          </div>
+          <PaginationControls
+            currentPage={currentPageState}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            loading={loading}
+          />
         )}
 
         {/* Custom Pagination Controls for Testing */}
         {paginationType === "custom" && (
-          <div className="flex items-center justify-between py-4">
-            <Typography variant="small" className="text-muted-foreground">
-              Page {currentPageState} of {totalPages}
-            </Typography>
-            <div className="flex gap-2">
-              <Card
-                variant="interactive"
-                size="sm"
-                onClick={() => handlePageChange(currentPageState - 1)}
-                disabled={currentPageState <= 1}
-                className="cursor-pointer"
-              >
-                <Typography variant="small">Previous</Typography>
-              </Card>
-              <Card
-                variant="interactive"
-                size="sm"
-                onClick={() => handlePageChange(currentPageState + 1)}
-                disabled={currentPageState >= totalPages}
-                className="cursor-pointer"
-              >
-                <Typography variant="small">Next</Typography>
-              </Card>
-            </div>
-          </div>
+          <PaginationControls
+            currentPage={currentPageState}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            loading={loading}
+          />
         )}
 
         {/* Intersection Observer Target */}
