@@ -658,4 +658,527 @@ describe("Table", () => {
 
     expect(handleLoadMore).toHaveBeenCalled();
   });
+
+  it("handles column width measurement", async () => {
+    // Mock getBoundingClientRect globally
+    const mockGetBoundingClientRect = jest.fn();
+    mockGetBoundingClientRect.mockReturnValue({
+      width: 150,
+      height: 20,
+      top: 0,
+      left: 0,
+      bottom: 20,
+      right: 150,
+    });
+
+    // Mock HTMLElement.prototype.getBoundingClientRect
+    const originalGetBoundingClientRect =
+      HTMLElement.prototype.getBoundingClientRect;
+    HTMLElement.prototype.getBoundingClientRect = mockGetBoundingClientRect;
+
+    render(
+      <Table
+        columns={basicColumns}
+        data={mockData}
+        stickyFirstColumns={2}
+        scrollable={true}
+        maxHeight="300px"
+      />,
+    );
+
+    // Wait for the effect to run
+    await waitFor(() => {
+      expect(mockGetBoundingClientRect).toHaveBeenCalled();
+    });
+
+    // Restore original method
+    HTMLElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+  });
+
+  it("handles column width measurement with row numbers", async () => {
+    // Mock getBoundingClientRect globally
+    const mockGetBoundingClientRect = jest.fn();
+    mockGetBoundingClientRect.mockReturnValue({
+      width: 150,
+      height: 20,
+      top: 0,
+      left: 0,
+      bottom: 20,
+      right: 150,
+    });
+
+    // Mock HTMLElement.prototype.getBoundingClientRect
+    const originalGetBoundingClientRect =
+      HTMLElement.prototype.getBoundingClientRect;
+    HTMLElement.prototype.getBoundingClientRect = mockGetBoundingClientRect;
+
+    render(
+      <Table
+        columns={basicColumns}
+        data={mockData}
+        showRowNumbers={true}
+        stickyFirstColumns={2}
+        scrollable={true}
+        maxHeight="300px"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mockGetBoundingClientRect).toHaveBeenCalled();
+    });
+
+    // Restore original method
+    HTMLElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+  });
+
+  it("handles show more pagination page change", () => {
+    const handleLoadMore = jest.fn();
+    render(
+      <Table
+        columns={basicColumns}
+        data={mockData}
+        paginationType="showMore"
+        pageSize={2}
+        onLoadMore={handleLoadMore}
+      />,
+    );
+
+    // Test that show more pagination doesn't call onPageChange
+    const showMoreButton = screen.getByText("Show More").closest("div");
+    fireEvent.click(showMoreButton!);
+    // Should not throw error
+  });
+
+  it("handles sticky column positioning with measured widths", () => {
+    render(
+      <Table
+        columns={basicColumns}
+        data={mockData}
+        stickyFirstColumns={2}
+        scrollable={true}
+        maxHeight="300px"
+      />,
+    );
+
+    // Test that sticky columns are rendered
+    const nameHeader = screen.getByText("Name").closest("th");
+    const emailHeader = screen.getByText("Email").closest("th");
+
+    expect(nameHeader).toHaveClass("sticky");
+    expect(emailHeader).toHaveClass("sticky");
+  });
+
+  it("handles sticky last column positioning with measured widths", () => {
+    const columnsWithActions = [
+      ...basicColumns,
+      { id: "actions", label: "Actions", width: 2 },
+    ];
+
+    render(
+      <Table
+        columns={columnsWithActions}
+        data={mockData}
+        stickyLastColumns={1}
+        scrollable={true}
+        maxHeight="300px"
+      />,
+    );
+
+    const actionsHeader = screen.getByText("Actions").closest("th");
+    expect(actionsHeader).toHaveClass("sticky");
+  });
+
+  it("handles sortable column click with sortable true", () => {
+    const sortableColumns: TableColumn[] = [
+      { id: "name", label: "Name", sortable: true },
+    ];
+
+    const handleSort = jest.fn();
+    render(
+      <Table columns={sortableColumns} data={mockData} onSort={handleSort} />,
+    );
+
+    const nameHeader = screen.getByText("Name").closest("th");
+    fireEvent.click(nameHeader!);
+    expect(handleSort).toHaveBeenCalledWith("name", "asc");
+  });
+
+  it("handles previous page button click", () => {
+    const handlePageChange = jest.fn();
+    render(
+      <Table
+        columns={basicColumns}
+        data={mockData}
+        paginationType="paged"
+        pageSize={1}
+        currentPage={2}
+        totalPages={3}
+        onPageChange={handlePageChange}
+      />,
+    );
+
+    const previousButton = screen.getByText("Previous").closest("div");
+    fireEvent.click(previousButton!);
+    expect(handlePageChange).toHaveBeenCalledWith(1);
+  });
+
+  it("handles show more pagination without onPageChange", () => {
+    render(
+      <Table
+        columns={basicColumns}
+        data={mockData}
+        paginationType="showMore"
+        pageSize={2}
+      />,
+    );
+
+    // Test that show more pagination works without onPageChange
+    expect(screen.getByText("Show More")).toBeInTheDocument();
+  });
+
+  it("handles sticky column positioning fallback", () => {
+    // Test sticky column positioning when columnWidths is empty (fallback case)
+    render(
+      <Table
+        columns={basicColumns}
+        data={mockData}
+        stickyFirstColumns={1}
+        scrollable={true}
+        maxHeight="300px"
+      />,
+    );
+
+    const nameHeader = screen.getByText("Name").closest("th");
+    expect(nameHeader).toHaveClass("sticky");
+  });
+
+  it("handles sticky last column positioning fallback", () => {
+    const columnsWithActions = [
+      ...basicColumns,
+      { id: "actions", label: "Actions", width: 2 },
+    ];
+
+    // Test sticky last column positioning when columnWidths is empty (fallback case)
+    render(
+      <Table
+        columns={columnsWithActions}
+        data={mockData}
+        stickyLastColumns={1}
+        scrollable={true}
+        maxHeight="300px"
+      />,
+    );
+
+    const actionsHeader = screen.getByText("Actions").closest("th");
+    expect(actionsHeader).toHaveClass("sticky");
+  });
+
+  it("handles sortable column click with sortable undefined", () => {
+    const sortableColumns: TableColumn[] = [
+      { id: "name", label: "Name" }, // sortable is undefined
+    ];
+
+    const handleSort = jest.fn();
+    render(
+      <Table columns={sortableColumns} data={mockData} onSort={handleSort} />,
+    );
+
+    const nameHeader = screen.getByText("Name").closest("th");
+    fireEvent.click(nameHeader!);
+    // Should not call handleSort when sortable is undefined
+    expect(handleSort).not.toHaveBeenCalled();
+  });
+
+  it("handles sortable column click with sortable false", () => {
+    const sortableColumns: TableColumn[] = [
+      { id: "name", label: "Name", sortable: false },
+    ];
+
+    const handleSort = jest.fn();
+    render(
+      <Table columns={sortableColumns} data={mockData} onSort={handleSort} />,
+    );
+
+    const nameHeader = screen.getByText("Name").closest("th");
+    fireEvent.click(nameHeader!);
+    // Should not call handleSort when sortable is false
+    expect(handleSort).not.toHaveBeenCalled();
+  });
+
+  it("handles show more pagination page change without onPageChange", () => {
+    // Test line 282: setCurrentPageState(page) in show more branch
+    render(
+      <Table
+        columns={basicColumns}
+        data={mockData}
+        paginationType="showMore"
+        pageSize={2}
+      />,
+    );
+
+    // This should trigger the setCurrentPageState(page) call in the else branch
+    const showMoreButton = screen.getByText("Show More").closest("div");
+    fireEvent.click(showMoreButton!);
+    // Should not throw error and should handle page change internally
+  });
+
+  it("handles sticky last column positioning with measured widths", async () => {
+    // Test lines 348-362: Complex sticky last column positioning logic
+    const columnsWithActions = [
+      ...basicColumns,
+      { id: "actions", label: "Actions", width: 2 },
+    ];
+
+    // Mock getBoundingClientRect to simulate measured widths
+    const mockGetBoundingClientRect = jest.fn();
+    mockGetBoundingClientRect.mockReturnValue({
+      width: 120,
+      height: 20,
+      top: 0,
+      left: 0,
+      bottom: 20,
+      right: 120,
+    });
+
+    const originalGetBoundingClientRect =
+      HTMLElement.prototype.getBoundingClientRect;
+    HTMLElement.prototype.getBoundingClientRect = mockGetBoundingClientRect;
+
+    render(
+      <Table
+        columns={columnsWithActions}
+        data={mockData}
+        stickyLastColumns={1}
+        scrollable={true}
+        maxHeight="300px"
+      />,
+    );
+
+    // Wait for width measurement to complete
+    await waitFor(() => {
+      expect(mockGetBoundingClientRect).toHaveBeenCalled();
+    });
+
+    const actionsHeader = screen.getByText("Actions").closest("th");
+    expect(actionsHeader).toHaveClass("sticky");
+
+    // Restore original method
+    HTMLElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+  });
+
+  it("handles sticky first column sortable click", () => {
+    // Test line 434: onClick={() => column.sortable && handleSort(column.id)} in sticky first columns
+    const sortableColumns: TableColumn[] = [
+      { id: "name", label: "Name", sortable: true },
+      { id: "email", label: "Email", sortable: true },
+      { id: "role", label: "Role", sortable: false },
+    ];
+
+    const handleSort = jest.fn();
+    render(
+      <Table
+        columns={sortableColumns}
+        data={mockData}
+        stickyFirstColumns={2}
+        scrollable={true}
+        maxHeight="300px"
+        onSort={handleSort}
+      />,
+    );
+
+    // Click on first sticky column (should be sortable)
+    const nameHeader = screen.getByText("Name").closest("th");
+    fireEvent.click(nameHeader!);
+    expect(handleSort).toHaveBeenCalledWith("name", "asc");
+
+    // Click on second sticky column (should be sortable)
+    const emailHeader = screen.getByText("Email").closest("th");
+    fireEvent.click(emailHeader!);
+    expect(handleSort).toHaveBeenCalledWith("email", "asc");
+  });
+
+  it("handles sticky last column sortable click", () => {
+    // Test line 526: onClick={() => column.sortable && handleSort(column.id)} in sticky last columns
+    const sortableColumns: TableColumn[] = [
+      { id: "name", label: "Name", sortable: true },
+      { id: "email", label: "Email", sortable: true },
+      { id: "role", label: "Role", sortable: false },
+      { id: "actions", label: "Actions", sortable: true },
+    ];
+
+    const handleSort = jest.fn();
+    render(
+      <Table
+        columns={sortableColumns}
+        data={mockData}
+        stickyLastColumns={1}
+        scrollable={true}
+        maxHeight="300px"
+        onSort={handleSort}
+      />,
+    );
+
+    // Click on last sticky column (should be sortable)
+    const actionsHeader = screen.getByText("Actions").closest("th");
+    fireEvent.click(actionsHeader!);
+    expect(handleSort).toHaveBeenCalledWith("actions", "asc");
+  });
+
+  it("handles sticky last column positioning with row numbers", async () => {
+    // Test lines 348-362 with row numbers enabled
+    const columnsWithActions = [
+      ...basicColumns,
+      { id: "actions", label: "Actions", width: 2 },
+    ];
+
+    // Mock getBoundingClientRect to simulate measured widths
+    const mockGetBoundingClientRect = jest.fn();
+    mockGetBoundingClientRect.mockReturnValue({
+      width: 120,
+      height: 20,
+      top: 0,
+      left: 0,
+      bottom: 20,
+      right: 120,
+    });
+
+    const originalGetBoundingClientRect =
+      HTMLElement.prototype.getBoundingClientRect;
+    HTMLElement.prototype.getBoundingClientRect = mockGetBoundingClientRect;
+
+    render(
+      <Table
+        columns={columnsWithActions}
+        data={mockData}
+        showRowNumbers={true}
+        stickyLastColumns={1}
+        scrollable={true}
+        maxHeight="300px"
+      />,
+    );
+
+    // Wait for width measurement to complete
+    await waitFor(() => {
+      expect(mockGetBoundingClientRect).toHaveBeenCalled();
+    });
+
+    const actionsHeader = screen.getByText("Actions").closest("th");
+    expect(actionsHeader).toHaveClass("sticky");
+
+    // Restore original method
+    HTMLElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+  });
+
+  it("handles show more pagination with internal page state", () => {
+    // Test line 282: setCurrentPageState(page) in show more branch
+    // This test specifically targets the else branch where onPageChange is not provided
+    const { rerender } = render(
+      <Table
+        columns={basicColumns}
+        data={mockData}
+        paginationType="showMore"
+        pageSize={1}
+      />,
+    );
+
+    // Click show more button to trigger internal page state change
+    const showMoreButton = screen.getByText("Show More").closest("div");
+    fireEvent.click(showMoreButton!);
+
+    // Re-render with more data to simulate page change
+    const moreData = [...mockData, ...mockData];
+    rerender(
+      <Table
+        columns={basicColumns}
+        data={moreData}
+        paginationType="showMore"
+        pageSize={1}
+      />,
+    );
+
+    // Should not throw error and should handle page change internally
+    expect(screen.getByText("Show More")).toBeInTheDocument();
+  });
+
+  it("handles sticky last column positioning with multiple columns and measured widths", async () => {
+    // Test lines 356-358: The loop logic in sticky last column positioning
+    const columnsWithMultipleActions = [
+      ...basicColumns,
+      { id: "actions1", label: "Actions 1", width: 2 },
+      { id: "actions2", label: "Actions 2", width: 2 },
+      { id: "actions3", label: "Actions 3", width: 2 },
+    ];
+
+    // Mock getBoundingClientRect to simulate measured widths
+    const mockGetBoundingClientRect = jest.fn();
+    mockGetBoundingClientRect.mockReturnValue({
+      width: 100,
+      height: 20,
+      top: 0,
+      left: 0,
+      bottom: 20,
+      right: 100,
+    });
+
+    const originalGetBoundingClientRect =
+      HTMLElement.prototype.getBoundingClientRect;
+    HTMLElement.prototype.getBoundingClientRect = mockGetBoundingClientRect;
+
+    render(
+      <Table
+        columns={columnsWithMultipleActions}
+        data={mockData}
+        stickyLastColumns={2} // Make last 2 columns sticky to trigger the loop
+        scrollable={true}
+        maxHeight="300px"
+      />,
+    );
+
+    // Wait for width measurement to complete
+    await waitFor(() => {
+      expect(mockGetBoundingClientRect).toHaveBeenCalled();
+    });
+
+    // Only the last 2 columns should be sticky: "Actions 2" and "Actions 3"
+    const actions2Header = screen.getByText("Actions 2").closest("th");
+    const actions3Header = screen.getByText("Actions 3").closest("th");
+    expect(actions2Header).toHaveClass("sticky");
+    expect(actions3Header).toHaveClass("sticky");
+
+    // Actions 1 should not be sticky
+    const actions1Header = screen.getByText("Actions 1").closest("th");
+    expect(actions1Header).not.toHaveClass("sticky");
+
+    // Restore original method
+    HTMLElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+  });
+
+  it("handles show more pagination page change internal state", () => {
+    // Test line 282: setCurrentPageState(page) in show more branch
+    // We need to test the internal handlePageChange function being called
+    const TestComponent = () => {
+      const [currentPage, setCurrentPage] = React.useState(1);
+
+      return (
+        <Table
+          columns={basicColumns}
+          data={mockData}
+          paginationType="showMore"
+          pageSize={1}
+          currentPage={currentPage}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
+      );
+    };
+
+    render(<TestComponent />);
+
+    // Click show more button to trigger page change
+    const showMoreButton = screen.getByText("Show More").closest("div");
+    fireEvent.click(showMoreButton!);
+
+    // This should trigger the internal page state change
+    // The component should still render without errors
+    expect(screen.getByText("Show More")).toBeInTheDocument();
+  });
 });
